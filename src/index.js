@@ -3,6 +3,11 @@ import 'pixi';
 import 'phaser';
 
 import Boot from './states/Boot';
+import Preload from './states/Preload';
+import Title from './states/Title';
+import Play from './states/Play';
+import Score from './states/Score';
+
 import config from './config/config'
 
 class Game extends Phaser.Game
@@ -15,10 +20,10 @@ class Game extends Phaser.Game
         super(config);
 
         this.state.add('Boot', Boot, false);
-        //GAME.state.add('Preload', Preload, false);
-        //GAME.state.add('Menu', Menu, false);
-        //GAME.state.add('Game', Game, false);
-        //GAME.state.add('Result', Result, false);
+        this.state.add('Preload', Preload, false);
+        this.state.add('Title', Title, false);
+        this.state.add('Play', Play, false);
+        this.state.add('Score', Score, false);
 
         this.state.start('Boot')
     }
@@ -40,7 +45,6 @@ function startGame()
 
     let game = new Game(gameConfig);
 }
-
 
 window.onload = () => {
     startGame();
