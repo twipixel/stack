@@ -14,7 +14,22 @@
 </head>
 <body>
     <div id="content"></div>
-    <script src="vendor.bundle.js"></script>
-    <script src="bundle.js"></script>
+
+    <script>
+        (function () {
+            if (navigator.userAgent.indexOf('Electron') >= 0) {
+                require('babel-register');
+                window.PIXI = require('./vendor/pixi');
+                window.p2 = require('./vendor/p2');
+                window.Phaser = require('./vendor/phaser-split');
+                require('./index');
+            }
+            else {
+                document.write('<script src="./vendor.bundle.js"><' + '/script>');
+                document.write('<script src="./bundle.js"><' + '/script>');
+            }
+        })();
+    </script>
+
 </body>
 </html>

@@ -1,3 +1,7 @@
+import config from './../config/config';
+
+const PREFIX_ASSET_URL = config.PREFIX_ASSET_URL;
+
 export default class Preload extends Phaser.State
 {
     preload()
@@ -9,11 +13,11 @@ export default class Preload extends Phaser.State
 
         this.load.setPreloadSprite(this.loaderBar);
 
-        this.load.atlasJSONArray('bricks', '../../assets/spritesheet/bricks.png', '../../assets/spritesheet/bricks.json');
+        this.load.atlasJSONArray('bricks', PREFIX_ASSET_URL + '/spritesheet/bricks.png', PREFIX_ASSET_URL + '/spritesheet/bricks.json');
 
-        this.load.audio('menuOver', ['../../assets/sound/menu-over.mp3']);
-        this.load.audio('menuOut', ['../../assets/sound/menu-out.mp3']);
-        this.load.audio('menuDown', ['../../assets/sound/menu-click.mp3']);
+        this.load.audio('menuOver', [PREFIX_ASSET_URL + '/sound/menu-over.mp3']);
+        this.load.audio('menuOut', [PREFIX_ASSET_URL + '/sound/menu-out.mp3']);
+        this.load.audio('menuDown', [PREFIX_ASSET_URL + '/sound/menu-click.mp3']);
     }
 
     create()

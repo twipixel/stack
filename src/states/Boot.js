@@ -1,10 +1,15 @@
+import config from './../config/config';
+
+const PREFIX_ASSET_URL = config.PREFIX_ASSET_URL;
+
 export default class Boot extends Phaser.State
 {
     preload()
     {
         this.game.stage.backgroundColor = '#8BC34A';
-        this.load.image('loaderBg', '../../assets/image/loader-bg.png');
-        this.load.image('loaderBar', '../../assets/image/loader-bar.png');
+
+        this.load.image('loaderBg', PREFIX_ASSET_URL + '/image/loader-bg.png');
+        this.load.image('loaderBar', PREFIX_ASSET_URL + '/image/loader-bar.png');
     }
 
     create()
