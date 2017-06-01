@@ -43,5 +43,9 @@ export default class Title extends Phaser.State
         this.menuPanel = this.add.group();
         this.menuPanel.add(this.title);
         this.menuPanel.add(this.start);
+
+
+        // debug 모드로 바로 시작
+        this.state.start('Play');
     }
 }
