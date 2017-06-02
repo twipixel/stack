@@ -49,7 +49,8 @@ export default class Play extends Phaser.State
     getNextBrick()
     {
         if (this.brick && this.brick.body) {
-            //this.brick.body.static = true;
+            this.brick.body.static = true;
+            this.brick.body.sleep();
         }
 
         let brick = this.getBrick();
@@ -74,26 +75,26 @@ export default class Play extends Phaser.State
         let sprite = this.game.add.sprite(brickX, 100, 'bricks', this.getRandomBrickColor());
         this.game.physics.p2.enable(sprite);
 
-        this.spriteMaterial = this.game.physics.p2.createMaterial('spriteMaterial', sprite.body);
+        if (this.currentMaterial) {
+            this.prevMaterial = this.currentMaterial;
+        }
 
-        let contactMaterial = this.game.physics.p2.createContactMaterial(this.spriteMaterial, this.spriteMaterial);
-        contactMaterial.friction = 1;
-        contactMaterial.restitution = 0;
-        contactMaterial.stiffness = 1e7;
-        contactMaterial.relaxation = 3;
-        contactMaterial.frictionStiffness = 1e7;
-        contactMaterial.frictionRelaxation = 1;
-        contactMaterial.surfaceVelocity = 0;
+        this.currentMaterial = this.game.physics.p2.createMaterial('spriteMaterial', sprite.body);
 
+        if (this.prevMaterial) {
+            let contactMaterial = this.game.physics.p2.createContactMaterial(this.prevMaterial, this.currentMaterial);
+            contactMaterial.friction = 10;
+            contactMaterial.restitution = 0;
+            //contactMaterial.stiffness = 1e7;
+            //contactMaterial.relaxation = 3;
+            //contactMaterial.frictionStiffness = 1e7;
+            //contactMaterial.frictionRelaxation = 1;
+            //contactMaterial.surfaceVelocity = 0;
+        }
 
-        //sprite.body.static = true;
-        sprite.body.mass = 100;
-        sprite.body.setZeroVelocity();
-        sprite.data.gravityScale = 0;
-        //sprite.body.allowSleep = true;
-        //sprite.body.sleepSpeedLimit = 1;
-
-
+        sprite.body.mass = 1;
+        sprite.body.allowSleep = true;
+        sprite.body.sleepSpeedLimit = 1;
 
         sprite.halfWidth = sprite.width / 2;
         sprite.halfHeight = sprite.height / 2;
