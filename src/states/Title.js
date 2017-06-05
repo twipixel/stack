@@ -46,6 +46,7 @@ export default class Title extends Phaser.State
 
 
         // debug 모드로 바로 시작
-        this.state.start('Play');
+        //this.state.start('Play');
+        this.state.start('PlayNoPhysics');
     }
 }

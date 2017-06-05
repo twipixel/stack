@@ -6,6 +6,7 @@ import Boot from './states/Boot';
 import Preload from './states/Preload';
 import Title from './states/Title';
 import Play from './states/Play';
+import PlayNoPhysics from './states/PlayNoPhysics';
 import Score from './states/Score';
 
 import config from './config/config'
@@ -22,7 +23,8 @@ class Game extends Phaser.Game
         this.state.add('Boot', Boot, false);
         this.state.add('Preload', Preload, false);
         this.state.add('Title', Title, false);
-        this.state.add('Play', Play, false);
+        //this.state.add('Play', Play, false);
+        this.state.add('PlayNoPhysics', PlayNoPhysics, false);
         this.state.add('Score', Score, false);
 
         this.state.start('Boot')

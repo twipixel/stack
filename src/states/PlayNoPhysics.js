@@ -1,10 +1,19 @@
-export default class Play extends Phaser.State
+import config from './../config/config';
+
+const GAME_WIDTH = config.GAME_WIDTH;
+const GAME_HEIGHT = config.GAME_HEIGHT;
+
+export default class PlayNoPhysics extends Phaser.State
 {
     init()
     {
         console.log('1. Play.init()');
-        this.BRICK_COLOR = ['blue', 'red', 'yellow'];
+        this.bricks = ['blue', 'red', 'yellow'];
         this.stackBricks = [];
+
+        this.game.world.bounds = new Phaser.Rectangle(0, 0, GAME_WIDTH, GAME_HEIGHT);
+        // setting gravity
+        this.game.physics.arcade.gravity = 250;
     }
 
     preload()
@@ -48,8 +57,8 @@ export default class Play extends Phaser.State
 
     createFloor()
     {
-        let w = this.game.world.width,
-            h = this.game.world.height,
+        let w = GAME_WIDTH,
+            h = GAME_HEIGHT,
             floorHeight = 100;
 
         let graphics = this.game.add.graphics(0, 0);
@@ -58,8 +67,7 @@ export default class Play extends Phaser.State
         graphics.drawRect(0, 0, w, floorHeight);
         graphics.endFill();
 
-        var debugInnerHeight = window.innerHeight;
-        var y = debugInnerHeight - floorHeight;
+        var y = h - floorHeight;
         let sprite = this.game.add.sprite(0, y, graphics.generateTexture());
         graphics.destroy();
         return sprite;
@@ -81,8 +89,8 @@ export default class Play extends Phaser.State
 
     getRandomBrick()
     {
-        let randomIndex = parseInt(Math.random() * this.BRICK_COLOR.length);
-        let randomFrame = this.BRICK_COLOR[randomIndex];
+        let randomIndex = parseInt(Math.random() * this.bricks.length);
+        let randomFrame = this.bricks[randomIndex];
         let sprite = this.game.add.sprite(-100, -100, 'bricks', randomFrame);
         //sprite.anchor.x = 0.5;
         //sprite.anchor.y = 0.5;
