@@ -3,5 +3,7 @@ export default {
     //GAME_HEIGHT: 1142,
     GAME_WIDTH: 540,
     GAME_HEIGHT: 540,
+    GAME_BOUNDS_WIDTH: 540,
+    GAME_BOUNDS_HEIGHT: 1200,
     PREFIX_ASSET_URL: './../assets/',
 }
