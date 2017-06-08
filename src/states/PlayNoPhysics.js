@@ -10,6 +10,7 @@ export default class PlayNoPhysics extends Phaser.State
         console.log('1. Play.init()');
         this.bricks = ['blue', 'red', 'yellow'];
         this.stackBricks = [];
+        this.bottomIndex = 0;
 
         this.game.world.bounds = new Phaser.Rectangle(0, 0, GAME_WIDTH, GAME_HEIGHT);
         // setting gravity
@@ -83,6 +84,7 @@ export default class PlayNoPhysics extends Phaser.State
     {
         let brick = this.getRandomBrick();
         this.stackBricks.push(brick);
+        brick.index = this.stackBricks.length - 1;
         brick.isLanding = false;
         brick.direction = (Math.random() < 0.5) ? -1 : 1;
         brick.speed = 4;
@@ -109,7 +111,7 @@ export default class PlayNoPhysics extends Phaser.State
         //let w = parseInt(100 + Math.random() * 50);
         let w = 150;
         let g = new Phaser.Graphics(this.game);
-        g.beginFill(Math.random() * 0xFFFFFF);
+        g.beginFill(Math.random() * 0xFFFFFF, 0.5);
         g.drawRect(0, 0, w, h);
         g.endFill();
         return g;
@@ -150,9 +152,12 @@ export default class PlayNoPhysics extends Phaser.State
                     tween.stop();
 
                     if (this.checkOverlap(brick, lastBrick) === true) {
+
+                        this.limitY = brick.y = this.limitY - brick.height;
+                        this.getCenterOfMass(this.bottomIndex);
+
+
                         if (this.checkBlance() === true) {
-                            this.limitY = brick.y = this.limitY - brick.height;
-                            console.log('stackBricks.length:', this.stackBricks.length);
                             this.brick = this.addBrick();
                         }
                         else {
@@ -176,6 +181,272 @@ export default class PlayNoPhysics extends Phaser.State
     }
 
     checkBlance()
+    {
+        console.log('');
+        console.log('[[ CHECK BLANCE ]]');
+        const len = this.stackBricks.length;
+
+        if (len === 1) {
+            return true;
+        }
+
+        let overhangCount = 1, r = 0, ratio, overhang, o = 0, topBrick, bottomBrick, topCx, bottomCx, topWidth, offsetX, direction, prevDirection = 'none';
+
+        for (let i = 1 ; i < len; i++) {
+            overhang = (i === 0) ? 0 : 1 / (2 * overhangCount);
+            topBrick = this.stackBricks[i];
+            bottomBrick = this.stackBricks[i - 1];
+
+            if (topBrick) {
+                topWidth = topBrick.width;
+
+                topCx = topBrick.x + topBrick.width / 2;
+                bottomCx = bottomBrick.x + bottomBrick.width / 2;
+
+                if (topCx < bottomCx) {
+                    direction = 'left';
+                    offsetX = bottomBrick.x - topBrick.x;
+                }
+                else {
+                    direction = 'right';
+                    offsetX = (topBrick.x + topBrick.width) - (bottomBrick.x + bottomBrick.width);
+                }
+
+                ratio = (i === 0) ? 0 : ((offsetX / topWidth) * 100) / 100;
+            }
+
+            // OVERHANG RESET
+            if (prevDirection !== 'none' && prevDirection !== direction) {
+                o = 0;
+                r = 0;
+                overhangCount = 1;
+            }
+            else {
+                o += overhang;
+                r += ratio;
+                overhangCount++;
+            }
+
+            console.log('OVERHANG [', this.digit(o), '/', this.digit(r), ']');
+
+
+            if (o < r) {
+                return false;
+            }
+            else {
+
+                let floorIndex = this.bottomIndex - 1;
+                floorIndex = (floorIndex < 0) ? 0 : floorIndex;
+
+                let floorBrick = this.stackBricks[floorIndex];
+                let limitX = (direction === 'left') ? floorBrick.x : floorBrick.x + floorBrick.width;
+
+                if (!this.limit) {
+                    let graphics = this.limit = this.game.add.graphics(0, 0);
+                    graphics.beginFill(0x3498db);
+                    graphics.drawCircle(0, 0, 10);
+                    graphics.endFill();
+                }
+
+
+                let limitInfo;
+
+                if (direction === 'left') {
+
+                    limitInfo = this.getLeftLimitInfo();
+                    this.bottomIndex = limitInfo.index;
+                    this.limit.x = limitInfo.x;
+                    this.limit.y = limitInfo.brick.y;
+                    this.game.stage.addChild(this.limit);
+                    let cm = this.getCenterOfMass(this.getFloorIndex());
+
+                    if (cm.x < limitInfo.x) {
+                        return false;
+                    }
+                }
+                else {
+
+                    limitInfo = this.getRightLimitInfo();
+
+                    this.bottomIndex = limitInfo.index;
+                    this.limit.x = limitInfo.x;
+                    this.limit.y = limitInfo.brick.y;
+                    this.game.stage.addChild(this.limit);
+                    let cm = this.getCenterOfMass(this.getFloorIndex());
+
+                    if (cm.x > limitInfo.x) {
+                        return false;
+                    }
+                }
+            }
+
+            if (prevDirection !== direction) {
+                this.bottomIndex = i;
+                console.log('BOTTOM INDEX:', this.bottomIndex);
+            }
+            prevDirection = direction;
+        }
+
+        return true;
+    }
+
+    getFloorIndex()
+    {
+        const len = this.stackBricks.length;
+
+        if (len === 1) {
+            return 0;
+        }
+
+        let topBrick, bottomBrick, topCx, bottomCx, direction, prevDirection = 'none', floorIndex = 0;
+
+        for (let i = 1 ; i < len; i++) {
+            topBrick = this.stackBricks[i];
+            bottomBrick = this.stackBricks[i - 1];
+
+            if (topBrick) {
+
+                topCx = topBrick.x + topBrick.width / 2;
+                bottomCx = bottomBrick.x + bottomBrick.width / 2;
+
+                if (topCx < bottomCx) {
+                    direction = 'left';
+                }
+                else {
+                    direction = 'right';
+                }
+            }
+
+            if (prevDirection !== direction) {
+                floorIndex = i;
+            }
+
+            prevDirection = direction;
+        }
+
+        return floorIndex;
+    }
+
+    getLeftLimitInfo()
+    {
+        let clone = this.stackBricks.slice(0);
+
+        var sortedBricks = clone.sort(function(a, b) {
+            return b.x - a.x;
+        });
+
+        sortedBricks.forEach(brick => {
+            console.log('LEFT:', brick.index, brick.x);
+        });
+
+        let brick = sortedBricks[0];
+
+        console.log(brick, brick.index, brick.x, brick.width);
+
+        let info = {
+            brick: brick,
+            index: brick.index,
+            x: brick.x,
+        }
+
+        console.log(info);
+        return info;
+    }
+
+    getRightLimitInfo()
+    {
+        let clone = this.stackBricks.slice(0);
+
+        var sortedBricks = clone.sort(function(a, b) {
+            return (a.x + a.width) - (b.x + b.width);
+        });
+
+        sortedBricks.forEach(brick => {
+            console.log('RIGHT:', brick.x + brick.width);
+        });
+
+        let brick = sortedBricks[0];
+
+        console.log(brick, brick.index, brick.x, brick.width);
+
+        let info = {
+            brick: brick,
+            index: brick.index,
+            x: brick.x + brick.width,
+        }
+
+        console.log(info);
+        return info;
+    }
+
+    getCenterOfMass(bottomIndex = 0)
+    {
+        if (!this.cm) {
+            let graphics = this.cm = this.game.add.graphics(0, 0);
+            graphics.beginFill(0xFF3300);
+            graphics.drawCircle(0, 0, 10);
+            graphics.endFill();
+        }
+
+        let n = this.stackBricks.length;
+        let bottomBrick = this.stackBricks[bottomIndex];
+        let sumx = bottomBrick.x + bottomBrick.width / 2;
+        let sumy = bottomBrick.y + bottomBrick.height / 2;
+
+        for (let i = bottomIndex + 1; i < n; i++) {
+            let brick = this.stackBricks[i];
+            let cx = brick.x + brick.width / 2;
+            let cy = brick.y + brick.height / 2;
+            sumx += cx;
+            sumy += cy;
+        }
+
+        let count = (n - bottomIndex);
+        this.cm.x = sumx / count;
+        this.cm.y = sumy / count;
+        this.game.stage.addChild(this.cm);
+        return new Phaser.Point(this.cm.x, this.cm.y);
+    }
+
+    getCenterOfMassAll()
+    {
+        if (!this.cm) {
+            let graphics = this.cm = this.game.add.graphics(0, 0);
+            graphics.beginFill(0xFF3300);
+            graphics.drawCircle(0, 0, 10);
+            graphics.endFill();
+            this.cm.x = this.brick.x + this.brick.width / 2;
+            this.cm.y = this.brick.y + this.brick.height / 2;
+        }
+        else {
+            let n = this.stackBricks.length;
+
+            let sumx = 0, sumy = 0;
+
+            console.log('n:', n);
+
+            for (let i = 0; i < n; i++) {
+                let brick = this.stackBricks[i];
+                let cx = brick.x + brick.width / 2;
+                let cy = brick.y + brick.height / 2;
+                sumx += cx;
+                sumy += cy;
+            }
+
+            let cx = sumx / n;
+            let cy = sumy / n;
+
+            this.cm.x = cx;
+            this.cm.y = cy;
+
+            this.game.stage.addChild(this.cm);
+        }
+
+        return new Phaser.Point(this.cm.x, this.cm.y);
+    }
+
+
+    checkBlanceLeftRight()
     {
         if (this.stackBricks.length == 1) true;
 
@@ -306,7 +577,7 @@ export default class PlayNoPhysics extends Phaser.State
 
     gameOver()
     {
-        console.log('       gameOver()');
+        console.log('*********** GAME OVER ***********()');
         //this.game.add.tween(this.brick).to( {rotation: 2}, 1000, Phaser.Easing.Bounce.Out, true);
     }
 }
