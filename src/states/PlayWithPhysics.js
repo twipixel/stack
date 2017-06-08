@@ -2,7 +2,7 @@ import config from './../config/config';
 
 const BRICK_COLOR = ['blue', 'red', 'yellow'];
 
-export default class Play extends Phaser.State
+export default class PlayWithPhysics extends Phaser.State
 {
     init()
     {
@@ -48,7 +48,7 @@ export default class Play extends Phaser.State
             this.game.camera.x += 4;
         }
 
-        console.log(this.game.camera.y);
+        //console.log(this.game.camera.y);
     }
 
     start()
@@ -63,7 +63,7 @@ export default class Play extends Phaser.State
         }
 
         let brick = this.brick = this.getBrick();
-        //this.game.camera.follow(brick, Phaser.Camera.FOLLOW_LOCKON, 0.1, 0.1);
+        this.game.camera.follow(brick, Phaser.Camera.FOLLOW_LOCKON, 0.1, 0.1);
         return brick;
     }
 

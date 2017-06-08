@@ -44,9 +44,11 @@ export default class Title extends Phaser.State
         this.menuPanel.add(this.title);
         this.menuPanel.add(this.start);
 
-
-        // debug 모드로 바로 시작
-        //this.state.start('Play');
-        this.state.start('PlayNoPhysics');
+        if (this.state.states['PlayWithPhysics']) {
+            this.state.start('PlayWithPhysics');
+        }
+        else {
+            this.state.start('PlayNoPhysics');
+        }
     }
 }

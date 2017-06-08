@@ -2,9 +2,12 @@
 
 #### 참조
 
-- [BrickStacker](http://game.guinnessworldrecords.com/)
-- [Restitution](http://www.html5gamedevs.com/topic/8997-p2-restitution/)
-- [Brick Stacker 설명](http://www.html5gamedevs.com/topic/29550-phaser-brick-stacker/)
+- 게임
+  - [BrickStacker](http://game.guinnessworldrecords.com/)
+  - [Brick Stacker 설명](http://www.html5gamedevs.com/topic/29550-phaser-brick-stacker/)
+- Stacking 이론
+  - [Block-stacking problem](https://en.wikipedia.org/wiki/Block-stacking_problem)
+  - [Book Stacking](https://www.youtube.com/watch?v=CdhuVhWTSMI)
 
 
 <br>
@@ -14,14 +17,14 @@
 - 6월
   - 2 (금) (D8)
   - 5 (월) - WebGL 원인 파악, 일정 산정
-  - 6 (화) 
+  - 6 (화) - 현충일
   - 7 (수) - WebGL 바닥 부터 새로 생성 해서 오류 파악
-  - 8 (목) - 카메라 이동
-  - 9 (금) - 점수 계산
-  - 12 (월) - 블럭 무너지는 것 감지
-  - 13 (화)
-  - 14 (수)
-  - 15 (목)
+  - 8 (목) - 밸런스 로직 계산
+  - 9 (금) - 밸런스 무너 졌을 때 블럭 처리 (회전)
+  - 12 (월) - 카메라 이동
+  - 13 (화) - 
+  - 14 (수) -
+  - 15 (목) - 
 
 <br>
 
