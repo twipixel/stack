@@ -6,7 +6,7 @@ export default class PlayWithPhysics extends Phaser.State
 {
     init()
     {
-        this.limitY = config.GAME_BOUNDS_HEIGHT;
+        this._limitY = config.GAME_HEIGHT;
         this.cursors = this.game.input.keyboard.createCursorKeys();
         this.game.physics.startSystem(Phaser.Physics.P2JS);
         this.game.physics.p2.gravity.y = 400;
@@ -19,7 +19,7 @@ export default class PlayWithPhysics extends Phaser.State
 
     create()
     {
-        this.game.world.setBounds(0, 0, config.GAME_BOUNDS_WIDTH, config.GAME_BOUNDS_HEIGHT);
+        this.game.world.setBounds(0, 0, config.WORLD_BOUNDS_WIDTH, config.WORLD_BOUNDS_HEIGHT);
         let worldMaterial = this.worldMaterial = this.game.physics.p2.createMaterial('worldMaterial');
         this.game.physics.p2.setWorldMaterial(worldMaterial, false, false, false, true);
 
@@ -109,7 +109,7 @@ export default class PlayWithPhysics extends Phaser.State
         sprite.halfWidth = sprite.width / 2;
         sprite.halfHeight = sprite.height / 2;
 
-        this.limitY = this.limitY + sprite.height;
+        this._limitY = this._limitY + sprite.height;
         return sprite;
     }
 
@@ -127,6 +127,6 @@ export default class PlayWithPhysics extends Phaser.State
 
     get cameraY()
     {
-        return this.limitY - 400;
+        return this._limitY - 400;
     }
 }

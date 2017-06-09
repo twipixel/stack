@@ -8407,10 +8407,10 @@ Body.prototype.fromPolygon = function(path,options){
         // Move all vertices so its center of mass is in the local center of the convex
         for(var j=0; j!==c.vertices.length; j++){
             var v = c.vertices[j];
-            vec2.sub(v,v,c.centerOfMass);
+            vec2.sub(v,v,c.centerPoint);
         }
 
-        vec2.scale(cm,c.centerOfMass,1);
+        vec2.scale(cm,c.centerPoint,1);
         c.updateTriangles();
         c.updateCenterOfMass();
         c.updateBoundingRadius();
@@ -9915,7 +9915,7 @@ function Convex(options){
      * @property centerOfMass
      * @type {Array}
      */
-    this.centerOfMass = vec2.fromValues(0,0);
+    this.centerPoint = vec2.fromValues(0,0);
 
     /**
      * Triangulated version of this convex. The structure is Array of 3-Arrays, and each subarray contains 3 integers, referencing the vertices.
@@ -10050,7 +10050,7 @@ var updateCenterOfMass_centroid = vec2.create(),
 Convex.prototype.updateCenterOfMass = function(){
     var triangles = this.triangles,
         verts = this.vertices,
-        cm = this.centerOfMass,
+        cm = this.centerPoint,
         centroid = updateCenterOfMass_centroid,
         n = updateCenterOfMass_n,
         a = updateCenterOfMass_a,

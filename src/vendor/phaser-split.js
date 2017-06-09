@@ -73248,10 +73248,10 @@ Phaser.Physics.P2.Body.prototype = {
                 for (var j = 0; j !== shape.vertices.length; j++)
                 {
                     var v = shape.vertices[j];
-                    p2.vec2.sub(v, v, shape.centerOfMass);
+                    p2.vec2.sub(v, v, shape.centerPoint);
                 }
 
-                p2.vec2.scale(cm, shape.centerOfMass, 1);
+                p2.vec2.scale(cm, shape.centerPoint, 1);
 
                 cm[0] -= this.world.pxmi(this.sprite.width / 2);
                 cm[1] -= this.world.pxmi(this.sprite.height / 2);
@@ -73327,10 +73327,10 @@ Phaser.Physics.P2.Body.prototype = {
             for (var j = 0; j !== c.vertices.length; j++)
             {
                 var v = c.vertices[j];
-                p2.vec2.sub(v, v, c.centerOfMass);
+                p2.vec2.sub(v, v, c.centerPoint);
             }
 
-            p2.vec2.scale(cm, c.centerOfMass, 1);
+            p2.vec2.scale(cm, c.centerPoint, 1);
 
             cm[0] -= this.world.pxmi(this.sprite.width / 2);
             cm[1] -= this.world.pxmi(this.sprite.height / 2);

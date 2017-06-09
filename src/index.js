@@ -33,13 +33,10 @@ class Game extends Phaser.Game
 
 function startGame()
 {
-    let gameWidth = config.GAME_WIDTH;
-    let gameHeight = config.GAME_HEIGHT;
-
     // There are a few more options you can set if needed, just take a look at Phaser.IGameConfig
     let gameConfig = {
-        width: gameWidth,
-        height: gameHeight,
+        width: config.GAME_WIDTH,
+        height: config.GAME_HEIGHT,
         renderer: Phaser.AUTO,
         parent: 'content',
         resolution: 1
