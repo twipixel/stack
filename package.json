@@ -5,7 +5,7 @@
   "main": "./src/index.js",
   "scripts": {
     "dev": "webpack --config webpack.dev.config.js",
-    "deploy": "webpack --config webpack.deploy.config.js",
+    "build": "webpack --config webpack.build.config.js",
     "electron": "electron electron.js",
     "test": "eslint ./src/**/**.js"
   },

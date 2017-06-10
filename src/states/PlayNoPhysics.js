@@ -508,7 +508,8 @@ export default class PlayNoPhysics extends Phaser.State
         console.log('------------------------------------------------------');
 
 
-        this.game.physics.startSystem(Phaser.Physics.P2JS);
+        //this.game.physics.startSystem(Phaser.Physics.P2JS);
+        //this.game.physics.p2.gravity.y = 400;
 
         const brick = result.brick;
 
@@ -523,13 +524,9 @@ export default class PlayNoPhysics extends Phaser.State
                     const brick = this.bricks[i];
 
                     //this.game.physics.p2.enable(brick);
-
-                    //brick.anchor.x = 0.5;
-                    //brick.anchor.y = 0.5;
-
-                    //const random  = 2 + (Math.random() * 2);
-                    //const randomRotation = (direction === 'left') ? -random : random;
-                    //this.game.add.tween(brick).to( {rotation: randomRotation}, 1000, Phaser.Easing.Bounce.Out, true);
+                    //brick.body.mass = 100;
+                    //brick.body.angularForce = 10;
+                    //brick.body.angle = 10;
                 }
             }
             else {
