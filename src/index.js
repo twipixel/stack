@@ -35,8 +35,8 @@ function startGame()
 {
     // There are a few more options you can set if needed, just take a look at Phaser.IGameConfig
     let gameConfig = {
-        width: config.GAME_WIDTH,
-        height: config.GAME_HEIGHT,
+        width: config.CAMERA_VIEW_WIDTH,
+        height: config.CAMERA_VIEW_HEIGHT,
         renderer: Phaser.AUTO,
         parent: 'content',
         resolution: 1

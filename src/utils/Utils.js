@@ -17,4 +17,23 @@ export default class Utils
         var n = Math.pow(10, power);
         return parseInt(num * n) / n;
     }
+
+
+    static getCircle(game, x = 0, y = 0, diameter = 10, color = 0xFFFFFF)
+    {
+        const g = game.add.graphics(x, y);
+        g.beginFill(color);
+        g.drawCircle(0, 0, diameter);
+        g.endFill();
+        return g;
+    }
+
+    static getLine(game, x = 0, y = 0, width = 10, color = 0xFFFFFF)
+    {
+        const g = game.add.graphics(x, y);
+        g.beginFill(color);
+        g.drawRect(0, 0, width, 1);
+        g.endFill();
+        return g;
+    }
 }

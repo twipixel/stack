@@ -6,10 +6,11 @@ export default class PlayWithPhysics extends Phaser.State
 {
     init()
     {
-        this._limitY = config.GAME_HEIGHT;
-        this.cursors = this.game.input.keyboard.createCursorKeys();
         this.game.physics.startSystem(Phaser.Physics.P2JS);
+
         this.game.physics.p2.gravity.y = 400;
+        this._limitY = config.CAMERA_VIEW_HEIGHT;
+        this.cursors = this.game.input.keyboard.createCursorKeys();
     }
 
     preload()
