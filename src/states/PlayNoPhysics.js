@@ -3,6 +3,7 @@ import config from './../config/config';
 
 
 const FLOOR_HEIGHT = 100;
+const BRICK_HEIGHT = 40;
 const BRICK_TOP_MARGIN_Y = 300;
 const CAMERA_VIEW_WIDTH = config.CAMERA_VIEW_WIDTH;
 const CAMERA_VIEW_HEIGHT = config.CAMERA_VIEW_HEIGHT;
@@ -24,7 +25,7 @@ export default class PlayNoPhysics extends Phaser.State
         console.log('[Debug]:', this.game.debug);
 
         this.bricks = [];
-        this.limitY = WORLD_BOUNDS_HEIGHT;
+        this.limitY = WORLD_BOUNDS_HEIGHT + BRICK_HEIGHT / 2;
         this.cursors = this.input.keyboard.createCursorKeys();
         this.world.setBounds(0, 0, WORLD_BOUNDS_WIDTH, WORLD_BOUNDS_HEIGHT);
     }
@@ -184,6 +185,7 @@ export default class PlayNoPhysics extends Phaser.State
     addBrick()
     {
         const brick = this.getRandomBrick();
+        brick.anchor.setTo(0.5);
         this.bricks.push(brick);
         brick.index = this.bricks.length - 1;
         brick.isLanding = false;
@@ -209,10 +211,9 @@ export default class PlayNoPhysics extends Phaser.State
         //const w = parseInt(100 + Math.random() * 50);
         //const h = 20;
         const w = 150;
-        const h = 40;
         const g = new Phaser.Graphics(this.game);
         g.beginFill(Math.random() * 0xFFFFFF, 0.5);
-        g.drawRect(0, 0, w, h);
+        g.drawRect(0, 0, w, BRICK_HEIGHT);
         g.endFill();
         return g;
     }
@@ -220,11 +221,12 @@ export default class PlayNoPhysics extends Phaser.State
     click()
     {
         const brick = this.brick;
+        const halfWidth = brick.width / 2;
 
         if (brick) {
-            let brickX = this.input.x - brick.width / 2;
-            brickX = brickX < 0 ? 0 : brickX;
-            brickX = brickX + brick.width > WORLD_BOUNDS_WIDTH ? WORLD_BOUNDS_WIDTH - brick.width : brickX;
+            let brickX = this.input.x;
+            brickX = brickX < halfWidth ? halfWidth : brickX;
+            brickX = brickX + halfWidth > WORLD_BOUNDS_WIDTH ? WORLD_BOUNDS_WIDTH - halfWidth : brickX;
             brick.x = brickX;
             brick.isLannding = true;
             this.drop(brick);
@@ -249,7 +251,7 @@ export default class PlayNoPhysics extends Phaser.State
 
                 if (this.checkOverlap(brick, lastBrick) === true) {
 
-                    this.limitY = brick.y = this.limitY - brick.height;
+                    this.limitY = brick.y = this.limitY - BRICK_HEIGHT;
 
                     const result = this.checkBlance();
 
@@ -270,10 +272,12 @@ export default class PlayNoPhysics extends Phaser.State
 
         if (brick && lastBrick) {
 
-            const left = brick.x,
-                right = brick.x + brick.width,
-                limitLeft = lastBrick.x,
-                limitRight = lastBrick.x + lastBrick.width;
+            const brickHalfWidth = brick.width / 2,
+                left = brick.x - brickHalfWidth,
+                right = brick.x + brickHalfWidth,
+                lastBrickHalfWidth = lastBrick.width / 2,
+                limitLeft = lastBrick.x - lastBrickHalfWidth,
+                limitRight = lastBrick.x + lastBrickHalfWidth;
 
             if (left >= limitLeft && left <= limitRight ||
                 right <= limitRight && right >= limitLeft ||
@@ -427,7 +431,7 @@ export default class PlayNoPhysics extends Phaser.State
         const brick = sortedBricks[0];
 
         const info = {
-            x: brick.x,
+            x: brick.x - brick.width / 2,
             brick: brick,
             index: brick.index
         };
@@ -456,7 +460,7 @@ export default class PlayNoPhysics extends Phaser.State
         const info = {
             brick: brick,
             index: brick.index,
-            x: brick.x + brick.width
+            x: brick.x + brick.width / 2
         };
 
         // DEBUG 코드
@@ -475,15 +479,14 @@ export default class PlayNoPhysics extends Phaser.State
         const n = this.bricks.length,
             bottomBrick = this.bricks[bottomIndex];
 
-        let sumx = bottomBrick.x + bottomBrick.width / 2,
-            sumy = bottomBrick.y + bottomBrick.height / 2;
+        let brick,
+            sumx = bottomBrick.x,
+            sumy = bottomBrick.y;
 
         for (let i = bottomIndex + 1; i < n; i++) {
-            let brick = this.bricks[i];
-            let cx = brick.x + brick.width / 2;
-            let cy = brick.y + brick.height / 2;
-            sumx += cx;
-            sumy += cy;
+            brick = this.bricks[i];
+            sumx += brick.x;
+            sumy += brick.y;
         }
 
         const count = (n - bottomIndex),
