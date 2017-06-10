@@ -511,8 +511,8 @@ export default class PlayNoPhysics extends Phaser.State
         console.log('------------------------------------------------------');
 
 
-        //this.game.physics.startSystem(Phaser.Physics.P2JS);
-        //this.game.physics.p2.gravity.y = 400;
+        this.game.physics.startSystem(Phaser.Physics.P2JS);
+        this.game.physics.p2.gravity.y = 400;
 
         const brick = result.brick;
 
@@ -520,16 +520,23 @@ export default class PlayNoPhysics extends Phaser.State
             if (result.weakPoint) {
                 console.log('[CASE 1]: center of mass problem');
 
+                const n = this.numBricks;
                 const direction = result.direction;
                 const weakIndex = result.weakPoint.index;
 
-                for (let i = weakIndex; i < this.numBricks; i++) {
+                for (let i = 0; i < n; i++) {
                     const brick = this.bricks[i];
 
-                    //this.game.physics.p2.enable(brick);
-                    //brick.body.mass = 100;
-                    //brick.body.angularForce = 10;
-                    //brick.body.angle = 10;
+                    this.game.physics.p2.enable(brick);
+                    brick.body.mass = 100;
+                }
+
+                const weakBrick = this.bricks[weakIndex + 1];
+
+                if (weakBrick) {
+                    weakBrick.body.mass = 100;
+                    weakBrick.body.angle = 360;
+                    weakBrick.body.angularForce = 360;
                 }
             }
             else {
