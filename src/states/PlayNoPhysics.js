@@ -25,6 +25,19 @@ export default class PlayNoPhysics extends Phaser.State
         console.log('[Debug]:', this.game.debug);
 
         this.bricks = [];
+        this.swingXAngle = 0;
+        this.swingYAngle = 0;
+        this.swingXSpeed = 0.05;
+        this.swingYSpeed = 0.07;
+        this.swingXRadius = (this.world.width - 300) / 2;
+        this.swingYRadius = 40;
+
+        /**
+         * 블럭을 쌓을 수 있는지 여부 (drop 중이면 false)
+         * @type {boolean}
+         */
+        this.canIBuild = true;
+        this.isGameOver = false;
         this.limitY = WORLD_BOUNDS_HEIGHT + BRICK_HEIGHT / 2;
         this.cursors = this.input.keyboard.createCursorKeys();
         this.world.setBounds(0, 0, WORLD_BOUNDS_WIDTH, WORLD_BOUNDS_HEIGHT);
@@ -45,7 +58,7 @@ export default class PlayNoPhysics extends Phaser.State
         this.setDebug(DEBUG_MODE);
 
         // DEBUG 코드
-        if (this.cameraPoint) {
+        if (DEBUG_MODE) {
             this.cameraPoint.y = this.startCameraY + this.cameraPoint.height;
         }
     }
@@ -58,28 +71,39 @@ export default class PlayNoPhysics extends Phaser.State
     addEvent()
     {
         this.input.onDown.add(this.click, this);
-        this.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR).onDown.add(this.drop, this);
+        this.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR).onDown.add(() => {
+            this.drop(this.brick);
+        }, this);
+
+        this.input.keyboard.addKey(Phaser.Keyboard.Q).onDown.add(() => {
+            this.enablePhysics();
+        }, this);
     }
 
     setDebug(isDebugMode)
     {
-        if (!isDebugMode) { return; }
+        if (isDebugMode && !this.weakPoint) {
+            const y = CAMERA_VIEW_HEIGHT - 20;
 
-        let x = 100;
-        let y = config.CAMERA_VIEW_HEIGHT - 20;
+            // 위크 디버그 포인트 생성
+            this.weakPoint = Utils.getCircle(this.game, 10, y, 10, 0x3498db);
 
+            // 무게 중심 디버그 포인트 생성
+            this.centerPoint = Utils.getCircle(this.game, 20, y, 10, 0xc0392b);
 
-        // 위크 디버그 포인트 생성
-        this.weakPoint = Utils.getCircle(this.game, 10, y, 10, 0x3498db);
+            // 카메라 위치 디버그 포인트
+            this.cameraPoint = Utils.getCircle(this.game, CAMERA_VIEW_WIDTH - 10, y, 10, 0xecf0f1);
 
-        // 무게 중심 디버그 포인트 생성
-        this.centerPoint = Utils.getCircle(this.game, 20, y, 10, 0xFF3300);
+            // 제한선 디버그 라인
+            this.limitLine = Utils.getLine(this.game, 10, CAMERA_VIEW_HEIGHT - 10, CAMERA_VIEW_WIDTH, 0x8e44ad);
+        }
 
-        // 카메라 위치 디버그 포인트
-        this.cameraPoint = Utils.getCircle(this.game, config.CAMERA_VIEW_WIDTH - 10, y, 10, 0xecf0f1);
-
-        // 제한선 디버그 라인
-        this.limitLine = Utils.getLine(this.game, 10, config.CAMERA_VIEW_HEIGHT - 10, config.CAMERA_VIEW_WIDTH, 0x8e44ad);
+        if (this.weakPoint) {
+            this.weakPoint.visible = isDebugMode;
+            this.centerPoint.visible = isDebugMode;
+            this.cameraPoint.visible = isDebugMode;
+            this.limitLine.visible = isDebugMode;
+        }
     }
 
     update()
@@ -105,7 +129,7 @@ export default class PlayNoPhysics extends Phaser.State
 
     render()
     {
-        if (DEBUG_MODE) {
+        if (Phaser.Device.desktop && DEBUG_MODE) {
             this.game.debug.cameraInfo(this.camera, 420, 32);
 
             const dropBrick = this.bricks[this.bricks.length - 1],
@@ -137,9 +161,21 @@ export default class PlayNoPhysics extends Phaser.State
     swing(brick)
     {
         if (brick && brick.isLanding === false) {
+            brick.x = this.brickCenterX + Math.sin(this.swingXAngle) * this.swingXRadius;
+            brick.y = this.brickCenterY + Math.cos(this.swingYAngle) * this.swingYRadius;
+
+            this.swingXAngle += this.swingXSpeed;
+            this.swingYAngle += this.swingYSpeed;
+        }
+    }
+
+    moveLeftRight(brick)
+    {
+        if (brick && brick.isLanding === false) {
             brick.x += brick.direction * brick.speed;
 
-            if (brick.x < 0 || brick.x + brick.width > this.world.width) {
+            const halfWidth = brick.width / 2;
+            if (brick.x - halfWidth < 0 || brick.x + halfWidth > this.world.width) {
                 brick.direction *= -1;
             }
         }
@@ -170,9 +206,10 @@ export default class PlayNoPhysics extends Phaser.State
 
     createBrick()
     {
+        this.canIBuild = true;
         this.brick = this.addBrick();
-        //this.camera.follow(this.brick);
 
+        //this.camera.follow(this.brick);
         this.updateCamera();
 
         /*this.world.forEach((child) => {
@@ -191,6 +228,8 @@ export default class PlayNoPhysics extends Phaser.State
         brick.isLanding = false;
         brick.direction = (Math.random() < 0.5) ? -1 : 1;
         brick.speed = 4;
+        brick.autoCull = true;
+        brick.checkWorldBounds = true;
         return brick;
     }
 
@@ -200,9 +239,8 @@ export default class PlayNoPhysics extends Phaser.State
         const sprite = this.game.add.sprite(-100, -100, randomTexture.generateTexture());
         randomTexture.destroy();
 
-
-        sprite.y = this.topY + BRICK_TOP_MARGIN_Y;
-        sprite.x = this.world.centerX;
+        sprite.x = this.brickCenterX;
+        sprite.y = this.startDropBrickY;
         return sprite;
     }
 
@@ -221,35 +259,40 @@ export default class PlayNoPhysics extends Phaser.State
     click()
     {
         const brick = this.brick;
-        const halfWidth = brick.width / 2;
 
         if (brick) {
-            let brickX = this.input.x;
-            brickX = brickX < halfWidth ? halfWidth : brickX;
-            brickX = brickX + halfWidth > WORLD_BOUNDS_WIDTH ? WORLD_BOUNDS_WIDTH - halfWidth : brickX;
-            brick.x = brickX;
-            brick.isLannding = true;
+            this.setBrickXToMouseX(brick);
             this.drop(brick);
         }
     }
 
+    setBrickXToMouseX(brick)
+    {
+        const halfWidth = brick.width / 2;
+        let brickX = this.input.x;
+        brickX = brickX < halfWidth ? halfWidth : brickX;
+        brickX = brickX + halfWidth > WORLD_BOUNDS_WIDTH ? WORLD_BOUNDS_WIDTH - halfWidth : brickX;
+        brick.x = brickX;
+    }
+
     drop(brick)
     {
-        if (!brick) { return; }
+        if (!brick || this.canIBuild === false) { return; }
 
+        this.canIBuild = false;
         brick.isLanding = true;
 
         const dropTo = this.world.height,
             lastBrick = this.bricks[this.bricks.length - 2],
-            tween = this.tween = this.game.add.tween(brick).to({y: dropTo}, 1000, Phaser.Easing.Bounce.Out, true);
+            tween = this.dropTween = this.game.add.tween(brick).to({y: dropTo}, 1000, Phaser.Easing.Bounce.Out, true);
 
         tween.onUpdateCallback(() => {
             // 제한선을 넘으면 충돌감지 및 밸런스 체크
             if (this.checkCrossedLimit(brick) === true) {
 
-                tween.stop();
-
                 if (this.checkOverlap(brick, lastBrick) === true) {
+
+                    tween.stop();
 
                     this.limitY = brick.y = this.limitY - BRICK_HEIGHT;
 
@@ -258,7 +301,7 @@ export default class PlayNoPhysics extends Phaser.State
                     (result.isBlance === true) ? this.createBrick() : this.gameOver(result);
                 }
                 else {
-                    this.gameOver({brick: brick, isBlance: true});
+                    this.gameOver({brick: brick, isBlance: true, reason: 'No Hit'});
                 }
             }
         });
@@ -296,7 +339,7 @@ export default class PlayNoPhysics extends Phaser.State
     {
         const n = this.bricks.length;
 
-        if (n === 1) { return {isBlance: true}; }
+        if (n === 1 || this.isGameOver) { return {isBlance: true}; }
 
         let offsetX,
             overhang, overhangRatio,
@@ -343,11 +386,14 @@ export default class PlayNoPhysics extends Phaser.State
             const floorIndex = this.getFloorIndex();
             if (maximumOverhang < totalOverhang) {
                 console.log('GameOver Maximum overhang! MAXIMUM: ', Utils.digit(maximumOverhang), ', OVERHANG:', Utils.digit(totalOverhang), ']');
+                const weakPoint = (direction === 'left') ? this.getLeftWeakPoint() : this.getRightWeakPoint();
                 return {
-                    isBlance: false,
                     brick: topBrick,
+                    isBlance: false,
                     direction: direction,
-                    floorIndex: floorIndex
+                    weakPoint: weakPoint,
+                    floorIndex: floorIndex,
+                    reason: 'Maximum Overhang is Over'
                 };
             }
 
@@ -355,11 +401,12 @@ export default class PlayNoPhysics extends Phaser.State
                 const weakPoint = this.getLeftWeakPoint();
                 if (this.getCenterOfMass(floorIndex).x < weakPoint.x) {
                     return {
-                        isBlance: false,
                         brick: topBrick,
+                        isBlance: false,
                         direction: direction,
+                        weakPoint: weakPoint,
                         floorIndex: floorIndex,
-                        weakPoint: weakPoint
+                        reason: 'Bricks Collapse'
                     };
                 }
             }
@@ -367,17 +414,20 @@ export default class PlayNoPhysics extends Phaser.State
                 const weakPoint = this.getRightWeakPoint();
                 if (this.getCenterOfMass(floorIndex).x > weakPoint.x) {
                     return {
-                        isBlance: false,
                         brick: topBrick,
+                        isBlance: false,
                         direction: direction,
+                        weakPoint: weakPoint,
                         floorIndex: floorIndex,
-                        weakPoint: weakPoint
+                        reason: 'Bricks Collapse'
                     };
                 }
             }
 
             prevDirection = direction;
         }
+
+        this.camera.shake(0.002, 250);
 
         return {isBlance: true};
     }
@@ -437,7 +487,7 @@ export default class PlayNoPhysics extends Phaser.State
         };
 
         // DEBUG 코드
-        if (this.weakPoint) {
+        if (DEBUG_MODE) {
             this.weakPoint.x = info.x;
             this.weakPoint.y = info.brick.y;
             this.world.bringToTop(this.weakPoint);
@@ -464,7 +514,7 @@ export default class PlayNoPhysics extends Phaser.State
         };
 
         // DEBUG 코드
-        if (this.weakPoint) {
+        if (DEBUG_MODE) {
             this.weakPoint.x = info.x;
             this.weakPoint.y = info.brick.y;
             this.world.bringToTop(this.weakPoint);
@@ -494,7 +544,7 @@ export default class PlayNoPhysics extends Phaser.State
             centerOfMassY = sumy / count;
 
         // DEBUG 코드
-        if (this.centerPoint) {
+        if (DEBUG_MODE) {
             this.centerPoint.x = centerOfMassX;
             this.centerPoint.y = centerOfMassY;
             this.world.bringToTop(this.centerPoint);
@@ -506,31 +556,35 @@ export default class PlayNoPhysics extends Phaser.State
 
     gameOver(result)
     {
+        if (this.isGameOver) { return; }
         console.log('------------------------------------------------------');
-        console.log('GAME OVER');
+        console.log('GAME OVER', result.reason ? '( ' + result.reason + ' )' : '');
         console.log('------------------------------------------------------');
 
-
+        this.isGameOver = true;
         this.game.physics.startSystem(Phaser.Physics.P2JS);
         this.game.physics.p2.gravity.y = 400;
 
-        const brick = result.brick;
+        const n = this.numBricks;
+
+        for (let i = 0; i < n; i++) {
+            const brick = this.bricks[i];
+
+            this.game.physics.p2.enable(brick);
+            brick.body.mass = 100;
+        }
+
+        // 꽈꽝!
+        this.camera.shake(0.05, 1000);
+        this.dropBrick.body.velocity.y = 5000;
+
 
         if (result.isBlance === false) {
-            if (result.weakPoint) {
-                console.log('[CASE 1]: center of mass problem');
 
-                const n = this.numBricks;
-                const direction = result.direction;
-                const weakIndex = result.weakPoint.index;
+            const weakPoint = result.weakPoint;
 
-                for (let i = 0; i < n; i++) {
-                    const brick = this.bricks[i];
-
-                    this.game.physics.p2.enable(brick);
-                    brick.body.mass = 100;
-                }
-
+            if (weakPoint) {
+                const weakIndex = weakPoint.index;
                 const weakBrick = this.bricks[weakIndex + 1];
 
                 if (weakBrick) {
@@ -539,15 +593,26 @@ export default class PlayNoPhysics extends Phaser.State
                     weakBrick.body.angularForce = 360;
                 }
             }
-            else {
-                console.log('[CASE 2]: overhang problem');
-            }
-        }
-        else {
-            console.log('[CASE 3]: No Hit');
         }
     }
 
+    /**
+     * 디버그 함수
+     * 모든 블럭에 물리 적용
+     */
+    enablePhysics()
+    {
+        this.game.physics.startSystem(Phaser.Physics.P2JS);
+        this.game.physics.p2.gravity.y = 400;
+
+        const n = this.numBricks;
+
+        for (let i = 0; i < n; i++) {
+            const brick = this.bricks[i];
+            this.game.physics.p2.enable(brick);
+            brick.body.mass = 100;
+        }
+    }
 
     /////////////////////////////////////////////////////////////////////////////////////
     //
@@ -556,16 +621,29 @@ export default class PlayNoPhysics extends Phaser.State
     /////////////////////////////////////////////////////////////////////////////////////
 
 
+    /**
+     * 시작 시 맨 바닥이 보이도록 설정
+     * @returns {number}
+     */
     get startCameraY()
     {
         return this.world.height - this.camera.height;
     }
 
+    /**
+     * 현재 보이는 화면의 가장 상단
+     * preload 에서 camera.y = startCameraY 로 설정 해줘야 정상 동작합니다.
+     * @returns {number}
+     */
     get topY()
     {
         return this.camera.view.y;
     }
 
+    /**
+     * 충돌검사를 제한선을 넘었을 때 하게 됩니다.
+     * @param value
+     */
     set limitY(value)
     {
         this._limitY = value;
@@ -581,6 +659,10 @@ export default class PlayNoPhysics extends Phaser.State
         return this._limitY;
     }
 
+    /**
+     * 카메라를 모션과 함께 이동 시킵니다.
+     * @param value
+     */
     set cameraY(value)
     {
         if (this.cameraTween) {
@@ -601,21 +683,63 @@ export default class PlayNoPhysics extends Phaser.State
         return this.camera.y;
     }
 
+    get dropBrick()
+    {
+        return this.bricks[this.bricks.length - 1];
+    }
 
+    /**
+     * 현재 떨어질 블럭 말고 stacking 된 최상단의 블럭을 반환합니다.
+     * @returns {*}
+     */
     get firstBrick()
     {
         return this.bricks[this.bricks.length - 2];
     }
 
-
+    /**
+     * 현재 보이는 화면의 중앙
+     * @returns {number}
+     */
     get viewCenterY()
     {
         return this.camera.view.y + this.camera.view.height / 2;
     }
 
+    /**
+     * 총 블럭의 개수
+     * @returns {Number}
+     */
     get numBricks()
     {
         return this.bricks.length;
+    }
+
+    /**
+     * swing 시 brick의 센터 x
+     * @returns {number}
+     */
+    get brickCenterX()
+    {
+        return this.world.centerX;
+    }
+
+    /**
+     * swing 시 brick 의 센터 y
+     * @returns {number}
+     */
+    get brickCenterY()
+    {
+        return this.startDropBrickY;
+    }
+
+    /**
+     * 드랍 벽돌 시작 위치
+     * @returns {number}
+     */
+    get startDropBrickY()
+    {
+        return this.topY + BRICK_TOP_MARGIN_Y;
     }
 
 }
