@@ -18,6 +18,9 @@ export default class Preload extends Phaser.State
         this.load.audio('menuOver', [PREFIX_ASSET_URL + '/sound/menu-over.mp3']);
         this.load.audio('menuOut', [PREFIX_ASSET_URL + '/sound/menu-out.mp3']);
         this.load.audio('menuDown', [PREFIX_ASSET_URL + '/sound/menu-click.mp3']);
+        this.load.audio('hit', [PREFIX_ASSET_URL + '/sound/tree.mp3']);
+        this.load.audio('heartbeat', [PREFIX_ASSET_URL + '/sound/heartbeat.m4a']);
+        this.load.audio('gameOver', [PREFIX_ASSET_URL + '/sound/bowling.mp3']);
     }
 
     create()

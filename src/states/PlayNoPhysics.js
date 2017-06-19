@@ -1,10 +1,12 @@
 import Utils from './../utils/Utils';
 import config from './../config/config';
+import Ruler from './../controls/Ruler';
 
 
-const FLOOR_HEIGHT = 100;
 const BRICK_HEIGHT = 40;
+const FLOOR_HEIGHT = 100;
 const BRICK_TOP_MARGIN_Y = 300;
+const LEVEL_GRADE = config.LEVEL_GRADE;
 const CAMERA_VIEW_WIDTH = config.CAMERA_VIEW_WIDTH;
 const CAMERA_VIEW_HEIGHT = config.CAMERA_VIEW_HEIGHT;
 const WORLD_BOUNDS_WIDTH = config.WORLD_BOUNDS_WIDTH;
@@ -24,11 +26,17 @@ export default class PlayNoPhysics extends Phaser.State
         console.log('[Input]:', this.input);
         console.log('[Debug]:', this.game.debug);
 
+
+        this.soundHit = this.game.add.audio('hit');
+        this.soundSlow = this.game.add.audio('heartbeat');
+        this.soundGameOver = this.game.add.audio('gameOver');
+
         this.bricks = [];
+        this.brickColors = [0xF44336, 0xE91E63, 0x9C27B0, 0x673AB7, 0x3F51B5, 0x2196F3, 0x03A9F4, 0x00BCD4, 0x009688, 0x4CAF50, 0x8BC34A, 0xCDDC39, 0xFFEB3B, 0xFFC107, 0xFF9800, 0xFF5722, 0x795548, 0x9E9E9E, 0x607D8B];
         this.swingXAngle = 0;
         this.swingYAngle = 0;
         this.swingXSpeed = 0.05;
-        this.swingYSpeed = 0.07;
+        this.swingYSpeed = 0.08;
         this.swingXRadius = (this.world.width - 300) / 2;
         this.swingYRadius = 40;
 
@@ -66,6 +74,7 @@ export default class PlayNoPhysics extends Phaser.State
     start()
     {
         this.createBrick();
+        this.createRuler();
     }
 
     addEvent()
@@ -77,6 +86,10 @@ export default class PlayNoPhysics extends Phaser.State
 
         this.input.keyboard.addKey(Phaser.Keyboard.Q).onDown.add(() => {
             this.enablePhysics();
+        }, this);
+
+        this.input.keyboard.addKey(Phaser.Keyboard.CONTROL).onDown.add(() => {
+            this.slowMotion();
         }, this);
     }
 
@@ -145,13 +158,22 @@ export default class PlayNoPhysics extends Phaser.State
         }
     }
 
+    shutdown()
+    {
+        this.world.removeChild(this.ruler);
+        this.ruler.destroy;
+        this.ruler = null;
+    }
+
     updateCamera()
     {
         if (this.numBricks === 1) { return; }
 
         const firstBrick = this.firstBrick;
         const nextBrickY = firstBrick.y + firstBrick.height;
-        const diffY = nextBrickY - this.viewCenterY;
+        const diffY = nextBrickY - this.viewCenterY - 200;
+
+        console.log('viewCenterY:', this.viewCenterY);
 
         if (diffY < 0) {
             this.cameraY = this.cameraY + diffY;
@@ -167,6 +189,27 @@ export default class PlayNoPhysics extends Phaser.State
             this.swingXAngle += this.swingXSpeed;
             this.swingYAngle += this.swingYSpeed;
         }
+    }
+
+    slowMotion()
+    {
+        if (this.slowTween) {
+            this.slowTween.stop();
+        }
+
+        const speedX = this.swingXSpeed;
+        const speedY = this.swingYSpeed;
+        const slowX = speedX / 10;
+        const slowY = speedY / 10;
+
+        this.slowTween = this.game.add.tween(this).to({swingXSpeed:slowX , swingYSpeed:slowY}, 200, Phaser.Easing.Sinusoidal.Out, true);
+
+        setTimeout(() => {
+            this.swingXSpeed = speedX;
+            this.swingYSpeed = speedY;
+        }, 800);
+
+        this.soundSlow.play();
     }
 
     moveLeftRight(brick)
@@ -219,6 +262,13 @@ export default class PlayNoPhysics extends Phaser.State
         return this.brick;
     }
 
+    createRuler()
+    {
+        this.ruler = new Ruler(this.game, WORLD_BOUNDS_HEIGHT);
+        this.ruler.x = CAMERA_VIEW_WIDTH;
+        this.world.addChild(this.ruler);
+    }
+
     addBrick()
     {
         const brick = this.getRandomBrick();
@@ -237,8 +287,8 @@ export default class PlayNoPhysics extends Phaser.State
     {
         const randomTexture = this.getRandomTexture();
         const sprite = this.game.add.sprite(-100, -100, randomTexture.generateTexture());
-        randomTexture.destroy();
-
+        //randomTexture.destroy();
+        sprite.randomTexture = randomTexture;
         sprite.x = this.brickCenterX;
         sprite.y = this.startDropBrickY;
         return sprite;
@@ -250,7 +300,9 @@ export default class PlayNoPhysics extends Phaser.State
         //const h = 20;
         const w = 150;
         const g = new Phaser.Graphics(this.game);
-        g.beginFill(Math.random() * 0xFFFFFF, 0.5);
+        const randomColorIndex = parseInt(Math.random() * this.brickColors.length);
+
+        g.beginFill(this.brickColors[randomColorIndex], 1);
         g.drawRect(0, 0, w, BRICK_HEIGHT);
         g.endFill();
         return g;
@@ -298,7 +350,13 @@ export default class PlayNoPhysics extends Phaser.State
 
                     const result = this.checkBlance();
 
-                    (result.isBlance === true) ? this.createBrick() : this.gameOver(result);
+                    if (result.isBlance === true) {
+                        this.hitAction(brick);
+                        this.createBrick();
+                    }
+                    else {
+                        this.gameOver(result);
+                    }
                 }
                 else {
                     this.gameOver({brick: brick, isBlance: true, reason: 'No Hit'});
@@ -325,6 +383,7 @@ export default class PlayNoPhysics extends Phaser.State
             if (left >= limitLeft && left <= limitRight ||
                 right <= limitRight && right >= limitLeft ||
                 limitLeft >= left && limitRight <= right) {
+
                 return true;
             }
 
@@ -335,11 +394,33 @@ export default class PlayNoPhysics extends Phaser.State
         return true;
     }
 
+    hitAction(brick)
+    {
+        if (this.guideLight) {
+            this.guideLight.destroy();
+            this.guideLightTween.stop();
+        }
+
+        const clone = this.game.add.sprite(-100, -100, brick.randomTexture.generateTexture());
+        clone.anchor.setTo(0.5, 1);
+        //clone.alpha = 0.5;
+        clone.x = brick.x;
+        clone.y = brick.y + brick.height / 2;
+
+        const height = clone.y - this.cameraY;
+        this.guideLightTween = this.game.add.tween(clone).to( {height: height, alpha:0.05}, 240, Phaser.Easing.Elastic.Out, true);
+        this.guideLight = clone;
+        this.soundHit.play();
+    }
+
     checkBlance()
     {
         const n = this.bricks.length;
 
-        if (n === 1 || this.isGameOver) { return {isBlance: true}; }
+        if (n === 1 || this.isGameOver) {
+            this.camera.shake(0.002, Math.random() * 250);
+            return {isBlance: true};
+        }
 
         let offsetX,
             overhang, overhangRatio,
@@ -427,7 +508,7 @@ export default class PlayNoPhysics extends Phaser.State
             prevDirection = direction;
         }
 
-        this.camera.shake(0.002, 250);
+        this.camera.shake(0.002, Math.random() * 250);
 
         return {isBlance: true};
     }
@@ -556,7 +637,15 @@ export default class PlayNoPhysics extends Phaser.State
 
     gameOver(result)
     {
-        if (this.isGameOver) { return; }
+        if (this.isGameOver) {
+            return;
+        }
+
+        if (this.guideLight) {
+            this.guideLight.destroy();
+            this.guideLightTween.stop();
+        }
+
         console.log('------------------------------------------------------');
         console.log('GAME OVER', result.reason ? '( ' + result.reason + ' )' : '');
         console.log('------------------------------------------------------');
@@ -575,9 +664,9 @@ export default class PlayNoPhysics extends Phaser.State
         }
 
         // 꽈꽝!
-        this.camera.shake(0.05, 1000);
+        this.camera.shake(0.2, 1000);
+        this.camera.follow(result.brick);
         this.dropBrick.body.velocity.y = 5000;
-
 
         if (result.isBlance === false) {
 
@@ -594,6 +683,8 @@ export default class PlayNoPhysics extends Phaser.State
                 }
             }
         }
+
+        this.soundGameOver.play();
     }
 
     /**
