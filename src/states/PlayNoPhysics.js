@@ -403,12 +403,12 @@ export default class PlayNoPhysics extends Phaser.State
 
         const clone = this.game.add.sprite(-100, -100, brick.randomTexture.generateTexture());
         clone.anchor.setTo(0.5, 1);
-        //clone.alpha = 0.5;
         clone.x = brick.x;
         clone.y = brick.y + brick.height / 2;
 
-        const height = clone.y - this.cameraY;
-        this.guideLightTween = this.game.add.tween(clone).to( {height: height, alpha:0.05}, 240, Phaser.Easing.Elastic.Out, true);
+        const height = clone.y - this.cameraY,
+            motionTime = 120 + Math.random() * 120;
+        this.guideLightTween = this.game.add.tween(clone).to( {height: height, alpha:0.05}, motionTime, Phaser.Easing.Elastic.Out, true);
         this.guideLight = clone;
         this.soundHit.play();
     }
