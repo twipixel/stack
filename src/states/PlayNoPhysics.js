@@ -451,7 +451,9 @@ export default class PlayNoPhysics extends Phaser.State
                     if (result.isBlance === true) {
                         this.limitY = brick.y = limitY;
                         this.hitAction(brick);
-                        this.totalScore += this.getScore();
+                        const score = this.getScore();
+                        this.showScore(score);
+                        this.totalScore += score;
                         this.createBrick();
                     }
                     else {
@@ -473,6 +475,24 @@ export default class PlayNoPhysics extends Phaser.State
                 }
             }
         });
+    }
+
+    showScore(score)
+    {
+        const firstBrick = (this.numBricks === 1) ? this.dropBrick : this.firstBrick;
+        const scoreText = this.game.add.text(firstBrick.x, firstBrick.y, score, { font: "65px Arial", fill: "#ff0044", align: "center" });
+        scoreText.anchor.setTo(0.5, 0.5);
+
+        const toX = Math.random() * this.camera.view.width;
+        const toY = this.viewBottomY - 300 - (Math.random() * (this.camera.view.height - 300));
+        const scoreTween = this.scoreTween = this.game.add.tween(scoreText).to({x:toX, y:toY}, 2000, Phaser.Easing.Exponential.Out, true);
+        scoreTween.onUpdateCallback(() => {
+            scoreText.y += 3;
+        }, this);
+
+        scoreTween.onComplete.add(() => {
+            scoreText.destroy();
+        }, this);
     }
 
     gameOverSlowMotoin(brick, limitY)
@@ -992,7 +1012,7 @@ export default class PlayNoPhysics extends Phaser.State
     }
 
     /**
-     * 총 블럭의 개수
+     * 총 블럭의 개
      * @returns {Number}
      */
     get numBricks()
@@ -1031,7 +1051,7 @@ export default class PlayNoPhysics extends Phaser.State
     set totalScore(value)
     {
         this._totalScore = value;
-        console.log('[SCORE]', value);
+        console.log('[SCORE]', '[', value, ']');
     }
 
     get totalScore()
