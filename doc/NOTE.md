@@ -26,11 +26,20 @@
 
 <br>
 
+#### TODO
+
+- 점수 이펙트
+- 점수 카운팅
+
+<br>
+
 #### 피쳐
 
 - Play
   - 시작 화면 꾸미기
   - ~~높이 자 그리기~~
+    - 자에 눈금으로 하지 말고 Level 을 표시하는게 좋겠다. Level 1 또는 Easy
+    - WarmingUp, Easy, Normal, Hard, Crazy 5개 레벨
   - 블럭 디자인 
   - ~~블럭 쌓기 성공 시 이펙트~~
     - ~~블럭 모양으로 위로 빛이 올라가는 이펙트~~
@@ -46,13 +55,23 @@
   - ~~게임 종료 시 checkBlance, gameOver 함수 비활성화~~
   - ~~블럭이 다 떨어지기 전까지 블럭 생성하지 않도록 처리~~
   - ~~특정 키 (CONTROL) 를 누르면 블럭이 슬로우 모션 하도록~~
-  - 점수 계산
-    - 어떻게 적용 시킬까요?
-  - 레벨 적용
-    - 블럭 넓이 조절
-    - swing 스피드 조절
+  - ~~점수 계산~~
+    - 위 아래 블럭의 중심점의 거리 차이
+      - 0 Perfect (10점)
+      - 1 ~ 5 사이 Excellent (5점)
+      - 1 ~ 10 사이 Good (3점)
+      - 10픽셀 이상 차이나면 (1점)
+  - 점수 이펙트
+    - Perfect 일때 슬로우 모션으로 딱 들어가는 것을 보여주자!
+  - ~~레벨 적용~~
+    - ~~블럭 넓이 조절~~
+    - ~~swing 스피드 조절~~
+  - ~~시간 패널티 적용~~
+    - ~~swing 스피드 조절~~
   - 계산 최적화 (계산값을 축척해 놓는 방식)
-  - 게임 종료 카메라 페이드 아웃 처리
+  - ~~게임 종료 카메라 페이드 아웃 처리~~
+  - gameOverSlowMotion 에서 히트 감지하고 brick.y 를 다시 위로 보내는게 어색한 부분 수정하기
+    - 충돌이 미리 감지 가능하니까 위에서 블럭 보내는 위치를 수정해보자.
 - Score
   - 재시작 추가
   - [삭제 로직 확인 (메모리)](http://www.emanueleferonato.com/2014/08/28/phaser-tutorial-understanding-phaser-states/)
@@ -75,9 +94,9 @@
 
 - overhang 넘쳤다는 오류가 있습니다.
   - 계속 일직선으로 쌓다 보면 발생하는거 같아요.
-- 2개 연속적으로 쌓으면 오류 발생
-  - 한개씩 쌓을 수 있도록 처리 필요
-- 높게 쌓았을 때 무너지는게 이상합니다. (그냥 땅으로 꺼지는 느낌)
+- ~~2개 연속적으로 쌓으면 오류 발생~~
+  - ~~한개씩 쌓을 수 있도록 처리 필요~~
+- ~~높게 쌓았을 때 무너지는게 이상합니다. (그냥 땅으로 꺼지는 느낌)~~
 - 오른쪽으로만 쌓다보면 무너질거 같은데 안무너짐? (이건 좀 고민해보자)
 - blance 로직에서 블럭이 반넘게 걸쳐 있으면 무조건 떨어지도록 수정이 필요
   - 한 가운데 6개 정도 쌓고 반이상 나가도록 쌓으면 쌓아집니다.
@@ -169,6 +188,7 @@
 
 #### 사운드
 
+- [freesound.org](https://www.freesound.org)
 - [Baseball Sound](https://www.freesoundeffects.com/free-sounds/baseball-10099/)
 - [Bowling Strike Free](https://www.freesoundeffects.com/free-sounds/bowling-10102/)
 - [Bowling Strike Pond5](https://www.pond5.com/sound-effect/66804939/sports-bowling-strike-single-pins-hard-clunk-rattle-loose-ti.html)
