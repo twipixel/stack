@@ -3,12 +3,19 @@ import config from './../config/config';
 import Ruler from './../controls/Ruler';
 import LevelRuler from './../controls/LevelRuler';
 
-
 const BRICK_WIDTH = 200;
 const BRICK_HEIGHT = 40;
 const FLOOR_HEIGHT = 100;
+const SCORE_JUMP_HEIGHT = 200;
 const BRICK_TOP_MARGIN_Y = 300;
 const CAMERA_BRICK_SPACE = 250;
+const SCORE_PERPECT_WIDTH = 1;
+const SCORE_GOOD_WIDTH = 20;
+const SCORE_EXCELLENT_WIDTH = SCORE_GOOD_WIDTH / 2;
+const SCORE_PREPECT = 10;
+const SCORE_EXCELLENT = 5;
+const SCORE_GOOD = 2;
+const SOCRE_NORMAL = 1;
 const LEVEL_GRADE = config.LEVEL_GRADE;
 const CAMERA_VIEW_WIDTH = config.CAMERA_VIEW_WIDTH;
 const CAMERA_VIEW_HEIGHT = config.CAMERA_VIEW_HEIGHT;
@@ -480,14 +487,23 @@ export default class PlayNoPhysics extends Phaser.State
     showScore(score)
     {
         const firstBrick = (this.numBricks === 1) ? this.dropBrick : this.firstBrick;
-        const scoreText = this.game.add.text(firstBrick.x, firstBrick.y, score, { font: "65px Arial", fill: "#ff0044", align: "center" });
+        const scoreText = this.game.add.text(firstBrick.x, firstBrick.y - firstBrick.height, score, { font: "65px Arial", fill: "#FFFFFF", align: "center" });
+
+        const sign = (Math.random() < 0.5) ? -1 : 1;
+        const toX = firstBrick.x + (sign * (Math.random() * firstBrick.width));
+
+        const toY = this.viewBottomY - 300 - (Math.random() * (this.camera.view.height - 300));
+
+        scoreText.vy = 0;
+        scoreText.gravity = 0.2;
+        scoreText.toY = firstBrick.y - SCORE_JUMP_HEIGHT;
         scoreText.anchor.setTo(0.5, 0.5);
 
-        const toX = Math.random() * this.camera.view.width;
-        const toY = this.viewBottomY - 300 - (Math.random() * (this.camera.view.height - 300));
-        const scoreTween = this.scoreTween = this.game.add.tween(scoreText).to({x:toX, y:toY}, 2000, Phaser.Easing.Exponential.Out, true);
+        const scoreTween = this.scoreTween = this.game.add.tween(scoreText).to({x: toX, alpha: 0}, 1000, Phaser.Easing.Exponential.Out, true);
+
         scoreTween.onUpdateCallback(() => {
-            scoreText.y += 3;
+            scoreText.vy += scoreText.gravity;
+            scoreText.y += 0.3 * (scoreText.toY - scoreText.y) + scoreText.vy;;
         }, this);
 
         scoreTween.onComplete.add(() => {
@@ -670,22 +686,17 @@ export default class PlayNoPhysics extends Phaser.State
         const bottomBrick = this.firstBrick;
         const diffX = Math.abs(bottomBrick.x - topBrick.x);
 
-        console.log('diffX', diffX);
-
-        if (diffX === 0) {
-            // Perfect
-            return 10;
+        if (diffX >= 0 && diffX <= SCORE_PERPECT_WIDTH) {
+            return SCORE_PREPECT;
         }
-        else if (diffX > 0 && diffX <= 5) {
-            // Excellent
-            return 5;
+        else if (diffX > SCORE_PERPECT_WIDTH && diffX <= SCORE_EXCELLENT_WIDTH) {
+            return SCORE_EXCELLENT;
         }
-        else if (diffX > 5 && diffX <= 10) {
-            // Good
-            return 2;
+        else if (diffX > SCORE_EXCELLENT_WIDTH && diffX <= SCORE_GOOD_WIDTH) {
+            return SCORE_GOOD;
         }
         else {
-            return 1;
+            return SOCRE_NORMAL;
         }
     }
 
