@@ -511,7 +511,7 @@ export default class PlayNoPhysics extends Phaser.State
     showScore(score)
     {
         const firstBrick = (this.numBricks === 1) ? this.dropBrick : this.firstBrick;
-        const scoreText = this.game.add.text(firstBrick.x, firstBrick.y - firstBrick.height, score, { font: "65px AppleGothic", fill: "#FFFFFF", align: "center" });
+        const scoreText = this.game.add.text(firstBrick.x, firstBrick.y - firstBrick.height, score, { font: "65px Arial", fill: "#FFFFFF", align: "center" });
 
         const sign = (Math.random() < 0.5) ? -1 : 1;
         const toX = firstBrick.x + (sign * (Math.random() * firstBrick.width));

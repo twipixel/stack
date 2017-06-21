@@ -31,9 +31,23 @@ export default class LevelRuler extends Phaser.Sprite
             const color = this.colorList[level - 1];
             const label = this.labelList[level - 1];
 
-            const levelText = this.game.add.text(this.game.world.width, y, label, { font: "74px AppleGothic", fill: color, align: "center"});
-            levelText.anchor.setTo(1, 0.5);
-            //levelText.alpha = 0.5;
+            //const levelText = this.game.add.text(this.game.world.width, y, label, { font: "74px Arial", fill: color, align: "center"});
+            const levelText = this.game.add.text(this.game.world.centerX, y, label, { font: "74px Arial", fill: color, align: "center"});
+            levelText.anchor.setTo(0.5, 0.5);
+            levelText.x = this.game.world.centerX;
+            levelText.y = y;
+            levelText.alpha = 0.5;
+
+            /*if (Phaser.Device.desktop) {
+                levelText.anchor.setTo(1, 0.5);
+            }
+            else {
+                // TODO 모바일에서는 텍스트 길이에 오류가 있네요!
+                levelText.anchor.setTo(0.5, 0.5);
+                levelText.x = this.game.world.centerX;
+                levelText.y = y;
+            }*/
+
             this.textList.push(levelText);
         }
 
