@@ -147,14 +147,14 @@ export default class PlayNoPhysics extends Phaser.State
             const y = CAMERA_VIEW_HEIGHT - 20;
 
             // 위크 디버그 포인트 생성
-            this.weakPoint = Utils.getCircle(this.game, 10, y, 10, 0x3498db);
+            this.weakPoint = Utils.getCircle(this.game, 10, y, 10, 0xFFEB3B, 0, 0xFFFFFF);
             this.weakPoint.x = this.world.centerX;
             this.weakPoint.y = this.viewBottomY + 100;
             this.weakPoint.tx = this.weakPoint.x;
             this.weakPoint.ty = this.weakPoint.y;
 
             // 무게 중심 디버그 포인트 생성
-            this.centerPoint = Utils.getCircle(this.game, 20, y, 10, 0xc0392b);
+            this.centerPoint = Utils.getCircle(this.game, 20, y, 10, 0xFF3300, 0, 0xFFFFFF);
             this.centerPoint.x = this.world.centerY;
             this.centerPoint.y = this.viewBottomY + 100;
             this.centerPoint.tx = this.centerPoint.x;
@@ -210,12 +210,23 @@ export default class PlayNoPhysics extends Phaser.State
             }*/
 
             const weakPoint = this.weakPoint,
-                centerPoint = this.centerPoint;
+                centerPoint = this.centerPoint,
+                limitLine = this.limitLine;
 
-            weakPoint.x += 0.1 * (weakPoint.tx - weakPoint.x);
-            weakPoint.y += 0.1 * (weakPoint.ty - weakPoint.y);
-            centerPoint.x += 0.1 * (centerPoint.tx - centerPoint.x);
-            centerPoint.y += 0.1 * (centerPoint.ty - centerPoint.y);
+            if (this.isGameOver === false) {
+                weakPoint.x += 0.1 * (weakPoint.tx - weakPoint.x);
+                weakPoint.y += 0.1 * (weakPoint.ty - weakPoint.y);
+                centerPoint.x += 0.1 * (centerPoint.tx - centerPoint.x);
+                centerPoint.y += 0.1 * (centerPoint.ty - centerPoint.y);
+            }
+            else {
+                weakPoint.vy += weakPoint.velocityY;
+                weakPoint.y += weakPoint.vy;
+                centerPoint.vy += centerPoint.velocityY;
+                centerPoint.y += centerPoint.vy;
+                limitLine.vy += limitLine.velocityY;
+                limitLine.y += limitLine.vy;
+            }
         }
     }
 
@@ -223,7 +234,7 @@ export default class PlayNoPhysics extends Phaser.State
     {
         if (this.ruler) {
             this.world.removeChild(this.ruler);
-            this.ruler.destroy;
+            this.ruler.destroy();
             this.ruler = null;
         }
     }
@@ -427,7 +438,11 @@ export default class PlayNoPhysics extends Phaser.State
         const brick = this.brick;
 
         if (brick) {
-            this.setBrickXToMouseX(brick);
+
+            if (Phaser.Device.desktop && DEBUG_MODE) {
+                this.setBrickXToMouseX(brick);
+            }
+
             this.drop(brick);
         }
     }
@@ -504,14 +519,14 @@ export default class PlayNoPhysics extends Phaser.State
         const toY = this.viewBottomY - 300 - (Math.random() * (this.camera.view.height - 300));
 
         scoreText.vy = 0;
-        scoreText.gravity = 0.2;
+        scoreText.velocityY = config.GRAVITY;
         scoreText.toY = firstBrick.y - SCORE_JUMP_HEIGHT;
         scoreText.anchor.setTo(0.5, 0.5);
 
         const scoreTween = this.scoreTween = this.game.add.tween(scoreText).to({x: toX, alpha: 0}, 1000, Phaser.Easing.Exponential.Out, true);
 
         scoreTween.onUpdateCallback(() => {
-            scoreText.vy += scoreText.gravity;
+            scoreText.vy += scoreText.velocityY;
             scoreText.y += 0.3 * (scoreText.toY - scoreText.y) + scoreText.vy;
             scoreText.scale.x += 0.3 * (1.5 - scoreText.scale.x);
             scoreText.scale.y += 0.3 * (1.5 - scoreText.scale.y);
@@ -581,7 +596,6 @@ export default class PlayNoPhysics extends Phaser.State
             motionTime = 120 + Math.random() * 120;
         this.guideLightTween = this.game.add.tween(clone).to( {height: height, alpha:0.05}, motionTime, Phaser.Easing.Elastic.Out, true);
         this.guideLight = clone;
-
 
         //this.soundHit.play();
         this.hitSounds[parseInt(Math.random() * this.hitSounds.length)].play();
@@ -686,7 +700,6 @@ export default class PlayNoPhysics extends Phaser.State
         }
 
         this.camera.shake(0.002, Math.random() * 250);
-
         return {isBlance: true};
     }
 
@@ -853,9 +866,23 @@ export default class PlayNoPhysics extends Phaser.State
             this.guideLightTween.stop();
         }
 
+        if (this.weakPoint) {
+            this.weakPoint.vy = 0;
+            this.weakPoint.velocityY = 0.1 + Math.random() * 0.4;
+            this.centerPoint.vy = 0;
+            this.centerPoint.velocityY = 0.1 + Math.random() * 0.4;
+        }
+
+        if (this.limitLine) {
+            this.limitLine.vy = 0;
+            this.limitLine.velocityY = 0.1 + Math.random() * 0.4;
+        }
+
         console.log('------------------------------------------------------');
         console.log('GAME OVER', result.reason ? '( ' + result.reason + ' )' : '');
         console.log('------------------------------------------------------');
+
+        this.ruler.boom();
 
         this.isGameOver = true;
         this.game.physics.startSystem(Phaser.Physics.P2JS);

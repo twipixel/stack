@@ -70,6 +70,7 @@
   - ~~게임 종료 카메라 페이드 아웃 처리~~
   - ~~gameOverSlowMotion 에서 히트 감지하고 brick.y 를 다시 위로 보내는게 어색한 부분 수정하기~~
     - ~~충돌이 미리 감지 가능하니까 위에서 블럭 보내는 위치를 수정해보자.~~
+  - ~~어느정도 되면 실제 모바일에서 테스트 하기~~
 - Score
   - 재시작 추가
   - [삭제 로직 확인 (메모리)](http://www.emanueleferonato.com/2014/08/28/phaser-tutorial-understanding-phaser-states/)

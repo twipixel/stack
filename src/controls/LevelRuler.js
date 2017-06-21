@@ -12,6 +12,7 @@ export default class LevelRuler extends Phaser.Sprite
         this.worldHeight = worldHeight;
         this.cameraHeight = cameraHeight;
         this.levelStartY = worldHeight;
+        this.tweenFactor = 0;
 
         this.initialize();
     }
@@ -52,13 +53,46 @@ export default class LevelRuler extends Phaser.Sprite
         }*/
     }
 
+    boom()
+    {
+        if (this.textList) {
+
+            const total = this.textList.length;
+            const tween = this.tween = this.game.add.tween(this).to({tweenFactor:1}, 5000, Phaser.Easing.Linear.None, true);
+
+            for (let i = 0; i < total; i++) {
+                const levelText = this.textList[i];
+                levelText.vx = 0;
+                levelText.vy = 0;
+                levelText.velocityX = 0.1 + Math.random();
+                levelText.velocityY = 0.1 + Math.random() * 0.4;
+                levelText.tr = Phaser.Math.degToRad(Math.random() * 30);
+            }
+
+            tween.onUpdateCallback(() => {
+                for (let i = 0; i < total; i++) {
+                    const levelText = this.textList[i];
+                    levelText.vx += levelText.velocityX;
+                    levelText.vy += levelText.velocityY;
+                    levelText.x -= levelText.vx;
+                    levelText.y += levelText.vy;
+                    levelText.rotation += 0.1 * (-levelText.tr - levelText.rotation);
+                }
+            });
+        }
+    }
+
     destroy()
     {
+        if (this.tween) {
+            this.tween.stop();
+        }
+
         if (this.textList) {
             const total = this.textList.length;
 
             for (let i = 0; i < total; i++) {
-                let levelText = this.textList[i];
+                const levelText = this.textList[i];
                 this.removeChild(levelText);
                 levelText.destroy();
             }
@@ -68,12 +102,13 @@ export default class LevelRuler extends Phaser.Sprite
             const total = this.gradations.length;
 
             for (let i = 0; i < total; i++) {
-                let gradation = this.gradations[i];
+                const gradation = this.gradations[i];
                 this.removeChild(gradation);
             }
         }
 
         this.game = null;
+        this.tween = null;
         super.destroy();
     }
 }

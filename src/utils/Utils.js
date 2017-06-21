@@ -19,10 +19,11 @@ export default class Utils
     }
 
 
-    static getCircle(game, x = 0, y = 0, diameter = 10, color = 0xFFFFFF)
+    static getCircle(game, x = 0, y = 0, diameter = 10, fillColor = 0xFFFFFF, lineThickness = 0, lineColor = 0xFFFFFF)
     {
         const g = game.add.graphics(x, y);
-        g.beginFill(color);
+        g.beginFill(fillColor);
+        g.lineStyle(lineThickness, lineColor);
         g.drawCircle(0, 0, diameter);
         g.endFill();
         return g;
