@@ -2,14 +2,14 @@
 //import 'pixi';
 //import 'phaser';
 
-import Boot from './states/Boot';
-import Preload from './states/Preload';
-import Title from './states/Title';
-import PlayNoPhysics from './states/PlayNoPhysics';
-import PlayWithPhysics from './states/PlayWithPhysics';
-import Score from './states/Score';
+import Boot from './stack/states/Boot';
+import Preload from './stack/states/Preload';
+import Title from './stack/states/Title';
+import PlayNoPhysics from './stack/states/PlayNoPhysics';
+import PlayWithPhysics from './stack/states/PlayWithPhysics';
+import Score from './stack/states/Score';
 
-import config from './config/config'
+import config from './stack/config/config'
 
 class Game extends Phaser.Game
 {

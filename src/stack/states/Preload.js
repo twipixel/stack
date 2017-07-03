@@ -1,4 +1,4 @@
-import config from './../config/config';
+import config from '../config/config';
 
 const PREFIX_ASSET_URL = config.PREFIX_ASSET_URL;
 

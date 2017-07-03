@@ -1,7 +1,7 @@
-import Utils from './../utils/Utils';
-import config from './../config/config';
-import Ruler from './../controls/Ruler';
-import LevelRuler from './../controls/LevelRuler';
+import Utils from '../utils/Utils';
+import config from '../config/config';
+import Ruler from '../controls/Ruler';
+import LevelRuler from '../controls/LevelRuler';
 
 const BRICK_WIDTH = 200;
 const BRICK_HEIGHT = 40;
