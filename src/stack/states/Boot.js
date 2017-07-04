@@ -15,9 +15,11 @@ export default class Boot extends Phaser.State
 
     create()
     {
-        this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-        this.scale.pageAlignVertically = true;
-        this.scale.pageAlignHorizontally = true;
+        this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+        this.game.scale.pageAlignVertically = true;
+        this.game.scale.pageAlignHorizontally = true;
+        this.game.scale.setShowAll();
+        this.game.scale.refresh();
 
         this.state.start('Preload');
     }
