@@ -27,11 +27,11 @@ const WORLD_BOUNDS_HEIGHT = Config.WORLD_BOUNDS_HEIGHT;
 const DEBUG_MODE = (Config.DEBUG_MODE) ? Config.DEBUG_MODE : false;
 
 
-export default class PlayNoPhysics extends Phaser.State
+export default class GameNoPhysics extends Phaser.State
 {
     init()
     {
-        console.log('[PLAY NO PHYSICS], DEBUG MODE:', DEBUG_MODE);
+        console.log('[GAME NO PHYSICS], DEBUG MODE:', DEBUG_MODE);
         console.log('[Game]:', this.game);
         console.log('[Stage]:', this.stage);
         console.log('[World]:', this.world);
@@ -99,6 +99,7 @@ export default class PlayNoPhysics extends Phaser.State
          */
         this.canIBuild = true;
         this.isGameOver = false;
+        this.isGameOverTriggered = false;
         this.limitY = WORLD_BOUNDS_HEIGHT + BRICK_HEIGHT / 2;
         this.cursors = this.input.keyboard.createCursorKeys();
         this.world.setBounds(0, 0, WORLD_BOUNDS_WIDTH, WORLD_BOUNDS_HEIGHT);
@@ -189,6 +190,31 @@ export default class PlayNoPhysics extends Phaser.State
             else if (this.cursors.right.isDown) {
                 this.camera.x += 4;
             }
+        }
+
+
+        // 게임 오버인데 특정 시간이 지나도 GameOver 로 안넘가는 케이스를 처리 필요 (1분 타임아웃 처리)
+        if (this.isGameOver) {
+
+            if (this.prevDropBrickX) {
+                const diffX = Math.abs(this.dropBrick.x - this.prevDropBrickX);
+                const diffY = Math.abs(this.dropBrick.y - this.prevDropBrickY);
+
+                if (diffX < 1 && diffY < 1) {
+
+                    if (this.isGameOverTriggered === false) {
+                        setTimeout(() => {
+                            // start(key, clearWorld, clearCache, parameter);
+                            this.state.start('GameOver', true, false, this.totalScore);
+                        }, 3000);
+                    }
+
+                    this.isGameOverTriggered = true;
+                }
+            }
+
+            this.prevDropBrickX = this.dropBrick.x;
+            this.prevDropBrickY = this.dropBrick.y;
         }
     }
 

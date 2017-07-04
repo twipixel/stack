@@ -37,6 +37,6 @@ export default class Preload extends Phaser.State
 
     create()
     {
-        this.state.start('Title');
+        this.state.start('GameTitle');
     }
 }

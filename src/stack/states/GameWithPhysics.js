@@ -2,7 +2,7 @@ import Config from '../config/Config';
 
 const BRICK_COLOR = ['blue', 'red', 'yellow'];
 
-export default class PlayWithPhysics extends Phaser.State
+export default class GameWithPhysics extends Phaser.State
 {
     init()
     {

@@ -4,10 +4,10 @@
 
 import Boot from './stack/states/Boot';
 import Preload from './stack/states/Preload';
-import Title from './stack/states/Title';
-import PlayNoPhysics from './stack/states/PlayNoPhysics';
-import PlayWithPhysics from './stack/states/PlayWithPhysics';
-import Score from './stack/states/Score';
+import GameTitle from './stack/states/GameTitle';
+import GameNoPhysics from './stack/states/GameNoPhysics';
+import GameWithPhysics from './stack/states/GameWithPhysics';
+import GameOver from './stack/states/GameOver';
 
 import config from './stack/config/config'
 
@@ -22,10 +22,10 @@ class Game extends Phaser.Game
 
         this.state.add('Boot', Boot, false);
         this.state.add('Preload', Preload, false);
-        this.state.add('Title', Title, false);
-        this.state.add('PlayNoPhysics', PlayNoPhysics, false);
-        //this.state.add('PlayWithPhysics', PlayWithPhysics, false);
-        this.state.add('Score', Score, false);
+        this.state.add('GameTitle', GameTitle, false);
+        this.state.add('GameNoPhysics', GameNoPhysics, false);
+        //this.state.add('GameWithPhysics', GameWithPhysics, false);
+        this.state.add('GameOver', GameOver, false);
 
         this.state.start('Boot')
     }
