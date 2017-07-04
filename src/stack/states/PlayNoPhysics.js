@@ -551,11 +551,13 @@ export default class PlayNoPhysics extends Phaser.State
         return tweenTime;
     }
 
-    checkCrossedLimit(brick) {
+    checkCrossedLimit(brick)
+    {
         return (brick.y + brick.height > this.limitY);
     }
 
-    checkOverlap(brick, lastBrick) {
+    checkOverlap(brick, lastBrick)
+    {
 
         if (brick && lastBrick) {
 
