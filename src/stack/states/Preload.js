@@ -1,6 +1,7 @@
-import config from '../config/config';
+import Config from '../config/Config';
 
-const PREFIX_ASSET_URL = config.PREFIX_ASSET_URL;
+const PREFIX_SOUND_URL = Config.PREFIX_SOUND_URL;
+const PREFIX_SPRITESHEET_URL = Config.PREFIX_SPRITESHEET_URL;
 
 export default class Preload extends Phaser.State
 {
@@ -13,25 +14,25 @@ export default class Preload extends Phaser.State
 
         this.load.setPreloadSprite(this.loaderBar);
 
-        this.load.atlasJSONArray('bricks', PREFIX_ASSET_URL + '/spritesheet/bricks.png', PREFIX_ASSET_URL + '/spritesheet/bricks.json');
+        this.load.atlasJSONArray('bricks', PREFIX_SPRITESHEET_URL + 'bricks.png', PREFIX_SPRITESHEET_URL + 'bricks.json');
 
-        this.load.audio('menuOver', [PREFIX_ASSET_URL + '/sound/menu-over.mp3']);
-        this.load.audio('menuOut', [PREFIX_ASSET_URL + '/sound/menu-out.mp3']);
-        this.load.audio('menuDown', [PREFIX_ASSET_URL + '/sound/menu-click.mp3']);
+        this.load.audio('menuOver', [PREFIX_SOUND_URL + 'menu-over.mp3']);
+        this.load.audio('menuOut', [PREFIX_SOUND_URL + 'menu-out.mp3']);
+        this.load.audio('menuDown', [PREFIX_SOUND_URL + 'menu-click.mp3']);
 
-        this.load.audio('baseball-bat', [PREFIX_ASSET_URL + '/sound/baseball-bat.mp3']);
-        this.load.audio('xylophone-a', [PREFIX_ASSET_URL + '/sound/xylophone-a.wav']);
-        this.load.audio('xylophone-b', [PREFIX_ASSET_URL + '/sound/xylophone-b.wav']);
-        this.load.audio('xylophone-c', [PREFIX_ASSET_URL + '/sound/xylophone-c.wav']);
-        this.load.audio('xylophone-c2', [PREFIX_ASSET_URL + '/sound/xylophone-c2.wav']);
-        this.load.audio('xylophone-d1', [PREFIX_ASSET_URL + '/sound/xylophone-d1.wav']);
-        this.load.audio('xylophone-e1', [PREFIX_ASSET_URL + '/sound/xylophone-e1.wav']);
-        this.load.audio('xylophone-f', [PREFIX_ASSET_URL + '/sound/xylophone-f.wav']);
-        this.load.audio('xylophone-g', [PREFIX_ASSET_URL + '/sound/xylophone-g.wav']);
-        this.load.audio('heartbeat', [PREFIX_ASSET_URL + '/sound/heartbeat-all.mp3']);
-        this.load.audio('bowling', [PREFIX_ASSET_URL + '/sound/bowling.mp3']);
-        this.load.audio('boom', [PREFIX_ASSET_URL + '/sound/boom.wav']);
-        this.load.audio('dripping', [PREFIX_ASSET_URL + '/sound/dripping.mp3']);
+        this.load.audio('baseball-bat', [PREFIX_SOUND_URL + 'baseball-bat.mp3']);
+        this.load.audio('xylophone-a', [PREFIX_SOUND_URL + 'xylophone-a.wav']);
+        this.load.audio('xylophone-b', [PREFIX_SOUND_URL + 'xylophone-b.wav']);
+        this.load.audio('xylophone-c', [PREFIX_SOUND_URL + 'xylophone-c.wav']);
+        this.load.audio('xylophone-c2', [PREFIX_SOUND_URL + 'xylophone-c2.wav']);
+        this.load.audio('xylophone-d1', [PREFIX_SOUND_URL + 'xylophone-d1.wav']);
+        this.load.audio('xylophone-e1', [PREFIX_SOUND_URL + 'xylophone-e1.wav']);
+        this.load.audio('xylophone-f', [PREFIX_SOUND_URL + 'xylophone-f.wav']);
+        this.load.audio('xylophone-g', [PREFIX_SOUND_URL + 'xylophone-g.wav']);
+        this.load.audio('heartbeat', [PREFIX_SOUND_URL + 'heartbeat-all.mp3']);
+        this.load.audio('bowling', [PREFIX_SOUND_URL + 'bowling.mp3']);
+        this.load.audio('boom', [PREFIX_SOUND_URL + 'boom.wav']);
+        this.load.audio('dripping', [PREFIX_SOUND_URL + 'dripping.mp3']);
     }
 
     create()

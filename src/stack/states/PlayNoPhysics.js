@@ -1,5 +1,5 @@
 import Utils from '../utils/Utils';
-import config from '../config/config';
+import Config from '../config/Config';
 import Ruler from '../controls/Ruler';
 import LevelRuler from '../controls/LevelRuler';
 
@@ -20,11 +20,11 @@ const LEVEL_LABEL = ['READY', 'EASY', 'NORMAL', 'HARD', 'CRAZY'];
 //const LEVEL_LABEL = ['LEVEL1', 'LEVEL2', 'LEVEL3', 'LEVEL4', 'LEVEL5'];
 const LEVEL_COLOR = ['#9E9E9E', '#03A9F4', '#4CAF50', '#FF5722', '#E91E63'];
 const LEVEL_GRADE = LEVEL_LABEL.length;
-const CAMERA_VIEW_WIDTH = config.CAMERA_VIEW_WIDTH;
-const CAMERA_VIEW_HEIGHT = config.CAMERA_VIEW_HEIGHT;
-const WORLD_BOUNDS_WIDTH = config.WORLD_BOUNDS_WIDTH;
-const WORLD_BOUNDS_HEIGHT = config.WORLD_BOUNDS_HEIGHT;
-const DEBUG_MODE = (config.DEBUG_MODE) ? config.DEBUG_MODE : false;
+const CAMERA_VIEW_WIDTH = Config.CAMERA_VIEW_WIDTH;
+const CAMERA_VIEW_HEIGHT = Config.CAMERA_VIEW_HEIGHT;
+const WORLD_BOUNDS_WIDTH = Config.WORLD_BOUNDS_WIDTH;
+const WORLD_BOUNDS_HEIGHT = Config.WORLD_BOUNDS_HEIGHT;
+const DEBUG_MODE = (Config.DEBUG_MODE) ? Config.DEBUG_MODE : false;
 
 
 export default class PlayNoPhysics extends Phaser.State
@@ -519,7 +519,7 @@ export default class PlayNoPhysics extends Phaser.State
         const toY = this.viewBottomY - 300 - (Math.random() * (this.camera.view.height - 300));
 
         scoreText.vy = 0;
-        scoreText.velocityY = config.GRAVITY;
+        scoreText.velocityY = Config.GRAVITY;
         scoreText.toY = firstBrick.y - SCORE_JUMP_HEIGHT;
         scoreText.anchor.setTo(0.5, 0.5);
 

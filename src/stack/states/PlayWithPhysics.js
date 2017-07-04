@@ -1,4 +1,4 @@
-import config from '../config/config';
+import Config from '../config/Config';
 
 const BRICK_COLOR = ['blue', 'red', 'yellow'];
 
@@ -9,7 +9,7 @@ export default class PlayWithPhysics extends Phaser.State
         this.game.physics.startSystem(Phaser.Physics.P2JS);
 
         this.game.physics.p2.gravity.y = 400;
-        this._limitY = config.CAMERA_VIEW_HEIGHT;
+        this._limitY = Config.CAMERA_VIEW_HEIGHT;
         this.cursors = this.game.input.keyboard.createCursorKeys();
     }
 
@@ -20,7 +20,7 @@ export default class PlayWithPhysics extends Phaser.State
 
     create()
     {
-        this.game.world.setBounds(0, 0, config.WORLD_BOUNDS_WIDTH, config.WORLD_BOUNDS_HEIGHT);
+        this.game.world.setBounds(0, 0, Config.WORLD_BOUNDS_WIDTH, Config.WORLD_BOUNDS_HEIGHT);
         let worldMaterial = this.worldMaterial = this.game.physics.p2.createMaterial('worldMaterial');
         this.game.physics.p2.setWorldMaterial(worldMaterial, false, false, false, true);
 

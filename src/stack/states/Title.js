@@ -37,7 +37,7 @@ export default class Title extends Phaser.State
         this.start.setDownSound(this.btnDownSound);
 
         this.start.onInputUp.add(()=>{
-            this.state.start('Play');
+            this.state.start('PlayNoPhysics');
         });
 
         this.menuPanel = this.add.group();
