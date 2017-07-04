@@ -199,7 +199,7 @@ export default class GameNoPhysics extends Phaser.State
                 const diffX = Math.abs(this.dropBrick.x - this.prevDropBrickX);
                 const diffY = Math.abs(this.dropBrick.y - this.prevDropBrickY);
 
-                if (diffX < 0 && diffY < 0) {
+                if (diffX < 1 && diffY < 1) {
 
                     if (this.isGameOverTriggered === false) {
                         setTimeout(() => {
