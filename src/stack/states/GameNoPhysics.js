@@ -262,6 +262,10 @@ export default class GameNoPhysics extends Phaser.State
             this.ruler.destroy();
             this.ruler = null;
         }
+
+        if (this.gameOverTimeOutId) {
+            clearTimeout(this.gameOverTimeOutId);
+        }
     }
 
     updateLevel()
@@ -954,7 +958,7 @@ export default class GameNoPhysics extends Phaser.State
         this.soundBowling.play();
 
         // 30초 안에 종료되지 않으면 GameOver 씬으로 자동으로 넘어갑니다.
-        setTimeout(() => {
+        this.gameOverTimeOutId = setTimeout(() => {
             this.state.start('GameOver', true, false, this.totalScore);
         }, 30000);
     }
