@@ -192,7 +192,7 @@ export default class GameNoPhysics extends Phaser.State
             }
         }
 
-        // 게임 오버인데 특정 시간이 지나도 GameOver 로 안넘가는 케이스를 처리 필요 (1분 타임아웃 처리)
+        // 게임 오버 함수에서 30초 타임 아웃이 설정되어 있어 여기서 트리거 안되더라도 게임오버로 넘어갑니다.
         if (this.isGameOver) {
 
             if (this.prevDropBrickX) {
