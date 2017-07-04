@@ -192,7 +192,6 @@ export default class GameNoPhysics extends Phaser.State
             }
         }
 
-
         // 게임 오버인데 특정 시간이 지나도 GameOver 로 안넘가는 케이스를 처리 필요 (1분 타임아웃 처리)
         if (this.isGameOver) {
 
@@ -200,7 +199,7 @@ export default class GameNoPhysics extends Phaser.State
                 const diffX = Math.abs(this.dropBrick.x - this.prevDropBrickX);
                 const diffY = Math.abs(this.dropBrick.y - this.prevDropBrickY);
 
-                if (diffX < 1 && diffY < 1) {
+                if (diffX < 0 && diffY < 0) {
 
                     if (this.isGameOverTriggered === false) {
                         setTimeout(() => {
@@ -953,6 +952,11 @@ export default class GameNoPhysics extends Phaser.State
         }
 
         this.soundBowling.play();
+
+        // 10초 안에 종료되지 않으면 GameOver 씬으로 자동으로 넘어갑니다.
+        setTimeout(() => {
+            this.state.start('GameOver', true, false, this.totalScore);
+        }, 10000);
     }
 
     /**
