@@ -2,16 +2,13 @@ import Gradation from './Gradation';
 
 export default class LevelRuler extends Phaser.Sprite
 {
-    constructor(game, labelList, colorList, worldHeight, cameraHeight)
+    constructor(game, labelList, colorList)
     {
         super(game);
 
         this.game = game;
         this.labelList = labelList;
         this.colorList = colorList;
-        this.worldHeight = worldHeight;
-        this.cameraHeight = cameraHeight;
-        this.levelStartY = worldHeight;
         this.tweenFactor = 0;
 
         this.initialize();
@@ -19,15 +16,18 @@ export default class LevelRuler extends Phaser.Sprite
 
     initialize()
     {
-        const totalLevel = this.labelList.length;
-        const levelHeight = (this.worldHeight - this.cameraHeight) / totalLevel;
+        const totalLevel = this.labelList.length,
+            levelStartY = this.game.world.height,
+            worldHeight = this.game.world.height,
+            cameraHeight = this.game.camera.height,
+            levelHeight = (worldHeight - cameraHeight) / totalLevel;
 
         this.textList = [];
         for (let i = 1; i <= totalLevel; i++) {
 
             const level = i;
             const height = i * levelHeight;
-            const y = this.levelStartY - height;
+            const y = levelStartY - height;
             const color = this.colorList[level - 1];
             const label = this.labelList[level - 1];
 
@@ -56,7 +56,7 @@ export default class LevelRuler extends Phaser.Sprite
 
             const level = i;
             const height = i * levelHeight;
-            const y = this.levelStartY - height;
+            const y = levelStartY - height;
             const color = this.colorList[level - 1];
             const label = this.labelList[level - 1];
 
@@ -94,6 +94,11 @@ export default class LevelRuler extends Phaser.Sprite
                 }
             });
         }
+    }
+
+    reset()
+    {
+
     }
 
     destroy()

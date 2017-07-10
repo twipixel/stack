@@ -140,6 +140,16 @@ export default class GameNoPhysics extends Phaser.State
         this.input.keyboard.addKey(Phaser.Keyboard.CONTROL).onDown.add(() => {
             this.slowMotion();
         }, this);
+
+        // world 높이를 500px 증가 시키기
+        this.input.keyboard.addKey(Phaser.Keyboard.A).onDown.add(() => {
+            this.setWorldBounds(this.world.width, this.world.height + 500);
+        }, this);
+
+        // world 높이를 500px 감소 시키기
+        this.input.keyboard.addKey(Phaser.Keyboard.Z).onDown.add(() => {
+            this.setWorldBounds(this.world.width, this.world.height - 500);
+        }, this);
     }
 
     setDebug(isDebugMode)
@@ -151,15 +161,15 @@ export default class GameNoPhysics extends Phaser.State
             this.weakPoint = Utils.getCircle(this.game, 10, y, 10, 0xFFEB3B, 0, 0xFFFFFF);
             this.weakPoint.x = this.world.centerX;
             this.weakPoint.y = this.viewBottomY + 100;
-            this.weakPoint.tx = this.weakPoint.x;
-            this.weakPoint.ty = this.weakPoint.y;
+            //this.weakPoint.tx = this.weakPoint.x;
+            //this.weakPoint.ty = this.weakPoint.y;
 
             // 무게 중심 디버그 포인트 생성
             this.centerPoint = Utils.getCircle(this.game, 20, y, 10, 0xFF3300, 0, 0xFFFFFF);
             this.centerPoint.x = this.world.centerY;
             this.centerPoint.y = this.viewBottomY + 100;
-            this.centerPoint.tx = this.centerPoint.x;
-            this.centerPoint.ty = this.centerPoint.y;
+            //this.centerPoint.tx = this.centerPoint.x;
+            //this.centerPoint.ty = this.centerPoint.y;
 
             // 제한선 디버그 라인
             this.limitLine = Utils.getLine(this.game, 10, CAMERA_VIEW_HEIGHT - 10, CAMERA_VIEW_WIDTH, 0x8e44ad);
@@ -178,17 +188,17 @@ export default class GameNoPhysics extends Phaser.State
 
         if (DEBUG_MODE) {
             if (this.cursors.up.isDown) {
-                this.camera.y -= 4;
+                this.camera.y -= 10;
             }
             else if (this.cursors.down.isDown) {
-                this.camera.y += 4;
+                this.camera.y += 10;
             }
 
             if (this.cursors.left.isDown) {
-                this.camera.x -= 4;
+                this.camera.x -= 10;
             }
             else if (this.cursors.right.isDown) {
-                this.camera.x += 4;
+                this.camera.x += 10;
             }
         }
 
@@ -221,7 +231,8 @@ export default class GameNoPhysics extends Phaser.State
     {
         if (Phaser.Device.desktop && DEBUG_MODE) {
 
-            /*this.game.debug.cameraInfo(this.camera, 420, 32);
+            /*
+            this.game.debug.cameraInfo(this.camera, 420, 32);
 
             const dropBrick = this.bricks[this.bricks.length - 1],
                 lastBrick = this.bricks[this.bricks.length - 2];
@@ -232,8 +243,11 @@ export default class GameNoPhysics extends Phaser.State
 
             if (lastBrick) {
                 this.game.debug.spriteCoords(lastBrick, 32, 80);
-            }*/
+            }
+            */
 
+
+            /*
             const weakPoint = this.weakPoint,
                 centerPoint = this.centerPoint,
                 limitLine = this.limitLine;
@@ -252,6 +266,7 @@ export default class GameNoPhysics extends Phaser.State
                 limitLine.vy += limitLine.velocityY;
                 limitLine.y += limitLine.vy;
             }
+            */
         }
     }
 
@@ -416,13 +431,11 @@ export default class GameNoPhysics extends Phaser.State
 
     createRuler()
     {
-        /*this.ruler = new Ruler(this.game, WORLD_BOUNDS_HEIGHT);
+        this.ruler = new Ruler(this.game);
         this.ruler.x = CAMERA_VIEW_WIDTH;
-        this.world.addChild(this.ruler);*/
+        this.world.addChild(this.ruler);
 
-        this.ruler = new LevelRuler(this.game, LEVEL_LABEL, LEVEL_COLOR, this.world.height, this.camera.height);
-        //this.ruler.x = CAMERA_VIEW_WIDTH;
-        //this.world.addChild(this.ruler);
+        //this.ruler = new LevelRuler(this.game, LEVEL_LABEL, LEVEL_COLOR);
     }
 
     addBrick()
@@ -814,10 +827,10 @@ export default class GameNoPhysics extends Phaser.State
 
         // DEBUG 코드
         if (DEBUG_MODE) {
-            /*this.weakPoint.x = info.x;
-            this.weakPoint.y = info.brick.y;*/
-            this.weakPoint.tx = info.x;
-            this.weakPoint.ty = info.brick.y;
+            this.weakPoint.x = info.x;
+            this.weakPoint.y = info.brick.y;
+            /*this.weakPoint.tx = info.x;
+            this.weakPoint.ty = info.brick.y;*/
             this.world.bringToTop(this.weakPoint);
             //console.log('weakPoint[', Utils.digit(this.weakPoint.x), Utils.digit(this.weakPoint.y), ']');
         }
@@ -843,10 +856,10 @@ export default class GameNoPhysics extends Phaser.State
 
         // DEBUG 코드
         if (DEBUG_MODE) {
-            /*this.weakPoint.x = info.x;
-            this.weakPoint.y = info.brick.y;*/
-            this.weakPoint.tx = info.x;
-            this.weakPoint.ty = info.brick.y;
+            this.weakPoint.x = info.x;
+            this.weakPoint.y = info.brick.y;
+            /*this.weakPoint.tx = info.x;
+            this.weakPoint.ty = info.brick.y;*/
             this.world.bringToTop(this.weakPoint);
             //console.log('weakPoint[', Utils.digit(this.weakPoint.x), Utils.digit(this.weakPoint.y), ']');
         }
@@ -875,10 +888,10 @@ export default class GameNoPhysics extends Phaser.State
 
         // DEBUG 코드
         if (DEBUG_MODE) {
-            /*this.centerPoint.x = centerOfMassX;
-            this.centerPoint.y = centerOfMassY;*/
-            this.centerPoint.tx = centerOfMassX;
-            this.centerPoint.ty = centerOfMassY;
+            this.centerPoint.x = centerOfMassX;
+            this.centerPoint.y = centerOfMassY;
+            /*this.centerPoint.tx = centerOfMassX;
+            this.centerPoint.ty = centerOfMassY;*/
             this.world.bringToTop(this.centerPoint);
             //console.log('cm[', Utils.digit(centerOfMassX), Utils.digit(centerOfMassY), ']', 'centerPonit[', Utils.digit(this.centerPoint.x), Utils.digit(this.centerPoint.y), ']');
         }
@@ -980,6 +993,46 @@ export default class GameNoPhysics extends Phaser.State
             brick.body.mass = 100;
         }
     }
+
+    setWorldBounds(width, height)
+    {
+        const diffWidth = this.world.width - width;
+        const diffHeight = this.world.height - height;
+        this.world.setBounds(0, 0, width, height);
+        this.changeWorldBounds(diffWidth, diffHeight);
+    }
+
+
+    changeWorldBounds(diffWorldWidth, diffWorldHeight)
+    {
+        let brick;
+        const total = this.bricks.length;
+
+        for(var i = 0; i < total; i++) {
+            brick = this.bricks[i];
+            brick.y -= diffWorldHeight;
+        }
+
+        this.camera.y -= diffWorldHeight;
+
+        this.ruler.reset();
+
+        this.limitY -= diffWorldHeight;
+
+
+        if (this.guideLight) {
+            this.guideLight.y -= diffWorldHeight;
+        }
+
+        if (this.weakPoint) {
+            this.weakPoint.y -= diffWorldHeight;
+        }
+
+        if (this.centerPoint) {
+            this.centerPoint.y -= diffWorldHeight;
+        }
+    }
+
 
     /////////////////////////////////////////////////////////////////////////////////////
     //

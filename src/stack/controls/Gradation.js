@@ -1,6 +1,6 @@
 export default class Gradation extends Phaser.Graphics
 {
-    constructor(game, isBold = false, color = 0x607D8B, alpha = 1)
+    constructor(game, isBold = false, color = 0xff0044, alpha = 1)
     {
         super(game);
 
@@ -13,8 +13,8 @@ export default class Gradation extends Phaser.Graphics
             this.gradationHeight = 10;
         }
         else {
-            //this.gradationWidth =  20;
-            this.gradationWidth =  0;
+            //this.gradationWidth =  0;
+            this.gradationWidth =  10;
             this.gradationHeight = 10;
         }
 
