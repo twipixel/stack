@@ -465,7 +465,7 @@ export default class GameNoPhysics extends Phaser.State
 
     getRandomTexture()
     {
-        const w = (this.isRandomBrickWidth === false) ? BRICK_WIDTH : (150 + Math.random() * 50);
+        const w = (this.isRandomBrickWidth === false) ? BRICK_WIDTH : (160 + Math.random() * 40);
         const g = new Phaser.Graphics(this.game);
         const randomColorIndex = parseInt(Math.random() * this.brickColors.length);
 
