@@ -34,7 +34,7 @@ class Game extends Phaser.Game
 function startGame()
 {
     // There are a few more options you can set if needed, just take a look at Phaser.IGameConfig
-    let gameConfig = {
+    const gameConfig = {
         width: config.CAMERA_VIEW_WIDTH,
         height: config.CAMERA_VIEW_HEIGHT,
         renderer: Phaser.AUTO,
@@ -42,7 +42,7 @@ function startGame()
         resolution: 1
     };
 
-    let game = new Game(gameConfig);
+    const game = new Game(gameConfig);
 }
 
 window.onload = () => {

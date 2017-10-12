@@ -38,19 +38,17 @@ export default class GameTitle extends Phaser.State
         startButton.setDownSound(btnDownSound);
 
         startButton.onInputUp.add(()=>{
-            this.state.start('GameNoPhysics');
+            if (this.state.states['GameWithPhysics']) {
+                this.state.start('GameWithPhysics');
+            }
+            else {
+                this.state.start('GameNoPhysics');
+            }
         });
 
         const menuPanel = this.add.group();
         menuPanel.add(gameTitleText);
         menuPanel.add(startButton);
-
-        /*if (this.state.states['GameWithPhysics']) {
-            this.state.start('GameWithPhysics');
-        }
-        else {
-            this.state.start('GameNoPhysics');
-        }*/
     }
 
 
