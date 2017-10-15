@@ -557,7 +557,9 @@ export default class GameNoPhysics extends Phaser.State
                         this.isGameOver = true;
                         const tweenTime = this.gameOverSlowMotoin(brick, limitY);
 
-                        setTimeout(() => {this.setPhysics();}, tweenTime)
+                        // setTimeout(() => {this.setPhysics();}, tweenTime)
+
+
 
 
 
@@ -611,6 +613,9 @@ export default class GameNoPhysics extends Phaser.State
         }
 
         const tweenTime = 5000;
+
+
+        this.enablePhysics();
 
         /*brick.y = limitY - brick.height;
         this.camera.shake(0.00001, tweenTime);
@@ -758,6 +763,9 @@ export default class GameNoPhysics extends Phaser.State
     }
 
 
+
+
+
     getScore()
     {
         if (this.numBricks === 1) {
@@ -875,23 +883,20 @@ export default class GameNoPhysics extends Phaser.State
      * @param bottomIndex
      * @returns {Phaser.Point}
      */
-    getCenterOfMass(bottomIndex = 0)
+    getCenterOfMass()
     {
         const numBricks = this.numBricks;
         let brick, sumx = 0, sumy = 0;
 
-        for (let i = bottomIndex + 1; i < numBricks; i++) {
+        for (let i = 1; i < numBricks; i++) {
             brick = this.bricks[i];
             sumx += brick.x;
             sumy += brick.y;
         }
 
-        const count = (numBricks - bottomIndex + 1)
+        const count = numBricks - 1
             , centerOfMassX = sumx / count
             , centerOfMassY = sumy / count;
-
-        console.log('count', count);
-
 
         // DEBUG 코드
         if (DEBUG_MODE) {
@@ -902,6 +907,21 @@ export default class GameNoPhysics extends Phaser.State
 
         return new Phaser.Point(centerOfMassX, centerOfMassY);
     }
+
+
+
+    getOverhang()
+    {
+        let l = 0;
+        const numBricks = this.numBricks;
+
+        for (let i = 1; i < numBricks; i++) {
+            l += this.bricks[i].width;
+        }
+
+        return l / 2 * (numBricks - 1 + 1);
+    }
+
 
 
     gameOver(result)
