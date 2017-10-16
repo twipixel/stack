@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>STACK</title>
+    <style type="text/css">
+        html, body, #content {
+            height: 100%;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #191919;
+        }
+    </style>
+</head>
+<body>
+    <div id="content"></div>
+
+    <script>
+        (function () {
+            if (navigator.userAgent.indexOf('Electron') >= 0) {
+                require('babel-register');
+                window.PIXI = require('./vendor/pixi');
+                window.p2 = require('./vendor/p2');
+                window.Phaser = require('./vendor/phaser-split');
+                require('./index');
+            }
+            else {
+                document.write('<script src="./vendor.bundle.js"><' + '/script>');
+                document.write('<script src="./bundle.js"><' + '/script>');
+            }
+        })();
+    </script>
+
+</body>
+</html>

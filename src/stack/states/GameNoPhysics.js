@@ -1,4 +1,6 @@
 import Utils from '../utils/Utils';
+import Sound from '../utils/Sound';
+import Logic from '../utils/Logic';
 import Config from '../config/Config';
 import Ruler from '../controls/Ruler';
 import LevelRuler from '../controls/LevelRuler';
@@ -36,7 +38,6 @@ export default class GameNoPhysics extends Phaser.State
      *
      * 무게 중심 공식 (OverHang 계산식)
      * https://medium.com/@indecs/stacking-books-debd97dd21ed
-     * 블럭 길이 / 2 * (n + 1)
      */
     init()
     {
@@ -75,31 +76,7 @@ export default class GameNoPhysics extends Phaser.State
 
     initialize()
     {
-        // 배트에 야구공 맞는 소리
-        this.soundHit = this.game.add.audio('baseball-bat');
-
-        // 실로폰 소리
-        this.soundHit0 = this.game.add.audio('xylophone-a');
-        this.soundHit1 = this.game.add.audio('xylophone-b');
-        this.soundHit2 = this.game.add.audio('xylophone-c');
-        this.soundHit3 = this.game.add.audio('xylophone-c2');
-        this.soundHit4 = this.game.add.audio('xylophone-d1');
-        this.soundHit5 = this.game.add.audio('xylophone-e1');
-        this.soundHit6 = this.game.add.audio('xylophone-f');
-        this.soundHit7 = this.game.add.audio('xylophone-g');
-        this.hitSounds = [this.soundHit0, this.soundHit1, this.soundHit2, this.soundHit3, this.soundHit4, this.soundHit5, this.soundHit6, this.soundHit7, ];
-
-        // 심장박동 소리
-        this.soundHeartbeat = this.game.add.audio('heartbeat');
-
-        // 볼링공 터지는 소리
-        this.soundBowling = this.game.add.audio('bowling');
-
-        // Boom ~~~
-        this.soundBoom = this.game.add.audio('boom');
-
-        // 물방울 떨어지는 소리
-        this.soundDripping = this.game.add.audio('dripping');
+        Sound.instance.initialize(this.game);
 
         this.bricks = [];
         this.brickColors = [0xF44336, 0xE91E63, 0x9C27B0, 0x673AB7, 0x3F51B5, 0x2196F3, 0x03A9F4, 0x00BCD4, 0x009688, 0x4CAF50, 0x8BC34A, 0xCDDC39, 0xFFEB3B, 0xFFC107, 0xFF9800, 0xFF5722, 0x795548, 0x9E9E9E, 0x607D8B];
@@ -232,6 +209,8 @@ export default class GameNoPhysics extends Phaser.State
         // 게임 오버 함수에서 30초 타임 아웃이 설정되어 있어 여기서 트리거 안되더라도 게임오버로 넘어갑니다.
         if (this.isGameOver) {
 
+            return;
+
             if (this.prevBrickX) {
                 const diffX = Math.abs(this.currentBrick.x - this.prevBrickX)
                     , diffY = Math.abs(this.currentBrick.y - this.prevBrickY);
@@ -354,14 +333,14 @@ export default class GameNoPhysics extends Phaser.State
 
                 this.slowTween = this.game.add.tween(this).to({swingXSpeed:speedX, swingYSpeed:speedY}, 200, Phaser.Easing.Exponential.Out, true);
                 this.slowTween.onComplete.add(() => {
-                    //this.soundHeartbeat.stop();
+                    Sound.instance.slowMotionSoundStop();
                     this.isSlowMotion = false;
                 });
             });
 
         }, this);
 
-        //this.soundHeartbeat.play();
+        Sound.instance.slowMotionSoundPlay();
         this.isSlowMotion = true;
     }
 
@@ -370,7 +349,7 @@ export default class GameNoPhysics extends Phaser.State
     {
         if (this.slowTween) {
             this.slowTween.stop();
-            this.soundHeartbeat.stop();
+            Sound.instance.slowMotionSoundStop();
             this.isSlowMotion = false;
         }
     }
@@ -501,7 +480,7 @@ export default class GameNoPhysics extends Phaser.State
 
         if (currentBrick) {
 
-            if (Phaser.Device.desktop && DEBUG_MODE) {
+            if (Phaser.Device.desktop && DEBUG_MODE && this.isGameOver === false) {
                 this.setBrickXToMouseX(currentBrick);
             }
 
@@ -522,7 +501,7 @@ export default class GameNoPhysics extends Phaser.State
 
     drop(brick)
     {
-        if (!brick || this.canIBuild === false) {
+        if (!brick || this.canIBuild === false || this.isGameOver) {
             return;
         }
 
@@ -558,12 +537,9 @@ export default class GameNoPhysics extends Phaser.State
                         const tweenTime = this.gameOverSlowMotoin(brick, limitY);
 
                         // setTimeout(() => {this.setPhysics();}, tweenTime)
-
-
-
-
-
                         //setTimeout(() => {this.gameOver(result);}, tweenTime)
+
+                        console.log('!!!!! is Here?');
                     }
                 }
             });
@@ -612,15 +588,21 @@ export default class GameNoPhysics extends Phaser.State
             this.gameOverTween.stop();
         }
 
-        const tweenTime = 5000;
+        this.isGameOver = true;
+        const tweenTime = 15000;
+        console.log('Opps!');
 
+        //this.enablePhysics();
 
-        this.enablePhysics();
+        setTimeout(() => {
+            this.enablePhysics();
+        }, 10000);
 
         /*brick.y = limitY - brick.height;
         this.camera.shake(0.00001, tweenTime);
         this.gameOverTween = this.game.add.tween(brick).to({y:limitY}, tweenTime, Phaser.Easing.Back.Out, true);*/
-        //this.soundDripping.play();
+
+        //Sound.instance.gameOverSoundPlay();
 
         brick.y = limitY;
         return tweenTime;
@@ -677,8 +659,7 @@ export default class GameNoPhysics extends Phaser.State
         this.guideLightTween = this.game.add.tween(clone).to( {height: height, alpha:0.05}, motionTime, Phaser.Easing.Elastic.Out, true);
         this.guideLight = clone;
 
-        //this.soundHit.play();
-        //this.hitSounds[parseInt(Math.random() * this.hitSounds.length)].play();
+        Sound.instance.randomStackSoundPlay();
     }
 
 
@@ -724,10 +705,20 @@ export default class GameNoPhysics extends Phaser.State
                 }
             }
 
+            var centerOfMass = this.getCenterOfMass(),
+                weak = (direction === 'left') ? this.getLeftWeakPoint() : this.getRightWeakPoint();
+
+
+
+            console.log('getOverhang', this.getOverhang(weak), 'direction', direction, 'centerOfmass',centerOfMass.x, 'weak', weak.x, 'diff', centerOfMass.x - weak.x);
+
+
 
             if (direction === 'left') {
                 const weakPoint = this.getLeftWeakPoint();
                 if (this.getCenterOfMass().x < weakPoint.x) {
+
+                    console.log('left');
 
                     return {
                         brick: topBrick,
@@ -743,6 +734,8 @@ export default class GameNoPhysics extends Phaser.State
                 const weakPoint = this.getRightWeakPoint();
                 if (this.getCenterOfMass().x > weakPoint.x) {
 
+
+                    console.log('right');
 
                     return {
                         brick: topBrick,
@@ -910,16 +903,18 @@ export default class GameNoPhysics extends Phaser.State
 
 
 
-    getOverhang()
+    getOverhang(weakPoint)
     {
-        let l = 0;
         const numBricks = this.numBricks;
+        let l, overhang, totalOverhang = 0;
 
         for (let i = 1; i < numBricks; i++) {
-            l += this.bricks[i].width;
+            l = this.bricks[i].width;
+            overhang = l / (2 * i);
+            totalOverhang += overhang;
         }
 
-        return l / 2 * (numBricks - 1 + 1);
+        return totalOverhang;
     }
 
 
@@ -993,7 +988,8 @@ export default class GameNoPhysics extends Phaser.State
             this.firstBrick.body.velocity.y = 5000;
         }
 
-        //this.soundBowling.play();
+
+        Sound.instance.boomSoundPlay();
 
         // 30초 안에 종료되지 않으면 GameOver 씬으로 자동으로 넘어갑니다.
         this.gameOverTimeOutId = setTimeout(() => {
@@ -1008,6 +1004,10 @@ export default class GameNoPhysics extends Phaser.State
      */
     enablePhysics()
     {
+        console.log('----------------------------');
+        console.log('enablePhysics');
+        console.log('----------------------------');
+
         this.game.physics.startSystem(Phaser.Physics.P2JS);
         this.game.physics.p2.gravity.y = 100;
 
